@@ -5,14 +5,14 @@
   
 
   
-  <title>SCC</title>
+  <title>EIP1167-最小合约代理的理解 | SCC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="EIP1167-最小合约代理的理解避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。 当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。 总体思路：设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来">
+  <meta name="description" content="避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。 当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。 总体思路：设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来请求时，子合约通过委托调用（del">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SCC">
+<meta property="og:title" content="EIP1167-最小合约代理的理解">
 <meta property="og:url" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/index.html">
 <meta property="og:site_name" content="SCC">
-<meta property="og:description" content="EIP1167-最小合约代理的理解避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。 当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。 总体思路：设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来">
+<meta property="og:description" content="避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。 当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。 总体思路：设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来请求时，子合约通过委托调用（del">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194253819.png">
 <meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194317822.png">
@@ -22,8 +22,8 @@
 <meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195316198.png">
 <meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195513372.png">
 <meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195957062.png">
-<meta property="article:published_time" content="2021-09-27T02:17:23.899Z">
-<meta property="article:modified_time" content="2021-09-27T03:17:04.786Z">
+<meta property="article:published_time" content="2021-09-27T02:42:40.000Z">
+<meta property="article:modified_time" content="2021-09-27T03:23:19.761Z">
 <meta property="article:author" content="Janson Woods">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194253819.png">
@@ -78,16 +78,26 @@
         <section id="main"><article id="post-EIP1167-最小合约代理的理解" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/" class="article-date">
-  <time datetime="2021-09-27T02:17:23.899Z" itemprop="datePublished">2021-09-27</time>
+  <time datetime="2021-09-27T02:42:40.000Z" itemprop="datePublished">2021-09-27</time>
 </a>
     
   </div>
   <div class="article-inner">
     
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      EIP1167-最小合约代理的理解
+    </h1>
+  
+
+      </header>
+    
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="EIP1167-最小合约代理的理解"><a href="#EIP1167-最小合约代理的理解" class="headerlink" title="EIP1167-最小合约代理的理解"></a>EIP1167-最小合约代理的理解</h1><p>避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。</p>
+        <p>避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。</p>
 <p>当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。</p>
 <h3 id="总体思路："><a href="#总体思路：" class="headerlink" title="总体思路："></a>总体思路：</h3><p>设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来请求时，子合约通过委托调用（delegatecall）的方式调用母合约的函数逻辑修改子合约的存储。因为子合约中并没有对应函数的处理逻辑，唯一实现的功能是委托调用母合约的函数，完成计算与状态更改，并将结果返回给用户。</p>
 <p>通过EIP1167这种模式的设计可以很好的避免因代码复用导致资源浪费的问题。</p>
@@ -168,7 +178,7 @@
           </li>
         
           <li>
-            <a href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/">(no title)</a>
+            <a href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/">EIP1167-最小合约代理的理解</a>
           </li>
         
       </ul>
