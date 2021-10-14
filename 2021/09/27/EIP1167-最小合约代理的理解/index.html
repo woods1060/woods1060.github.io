@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>eip1167-最小合约代理的理解 | SCC</title>
+  <title>eip1167-最小合约代理的理解 | SCS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   <meta name="keywords" content="EIP协议" />
@@ -15,9 +15,9 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="EIP1167-最小合约代理的理解">
 <meta property="og:url" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/index.html">
-<meta property="og:site_name" content="SCC">
+<meta property="og:site_name" content="SCS">
 <meta property="og:description" content="避免“重复部署某一个合约导致过多的存储空间被用在重复的运行时字节码的存储”。 当需要某一份代码被大量部署时，这样就会使得大量的存储空间来存储相同的运行字节码，并消耗大量的Gas费用，引入EIP1167-最小合约代理来节省这部分存储与Gas消耗。 总体思路：设置一个母合约被用来委托调用，实现合约的逻辑部分；通过工厂合约创建多个子合约与用户直接交互。当用户向子合约发来请求时，子合约通过委托调用（del">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale">
 <meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194253819.png">
 <meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194317822.png">
 <meta property="og:image" content="http://example.com/2021/09/27/EIP1167-%E6%9C%80%E5%B0%8F%E5%90%88%E7%BA%A6%E4%BB%A3%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3/image-20210925194435666.png">
@@ -327,7 +327,7 @@
   <div class="container">
       	<div class="row">
 	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
-	      <p id="copyRightEn">Copyright &copy; 2013 - 2021 SCC All Rights Reserved.</p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2021 SCS All Rights Reserved.</p>
 	      
 	      
     		<p class="busuanzi_uv">
@@ -482,7 +482,7 @@
         </div>
          <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
           <div class="panel-body">
-            SCC
+            SCS
           </div>
           <div class="panel-body">
             Copyright © 2021 Janson Woods All Rights Reserved.
